@@ -21,5 +21,7 @@ int remove(Lista *lista, long long grau);
 
 long long int grau (Lista *lista);
 
+int escala (Lista *lista, long long int escala);
+
 #endif
 
