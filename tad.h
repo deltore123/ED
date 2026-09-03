@@ -3,7 +3,7 @@
 
 #define ERRO -1
 
-typedef struct Lista lista;
+typedef struct Lista Lista;
 
 Lista *cria_lista(char chave);
 
@@ -17,7 +17,7 @@ Lista *encontra_listas (Lista **lista, int quantidade, char nome);
 
 int busca_coeficiente (Lista *lista, int expoente);
 
-int remove(Lista *lista, long long grau);
+int remove_elemento(Lista *lista, long long grau);
 
 long long int grau (Lista *lista);
 

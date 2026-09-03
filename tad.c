@@ -57,11 +57,13 @@ int adiciona_elemento (Lista *lista, long long coeficiente, long long expoente){
         return 0;
     }
 
+    
+    Termo *atual = lista->inicio;
+
     if (atual == NULL){
         return ERRO;
     }
 
-    Termo *atual = lista->inicio;
 
     while (atual->proximo != NULL && atual->proximo->expoente > expoente){
         atual = atual->proximo;
@@ -183,7 +185,7 @@ int busca_coeficiente (Lista *lista, int expoente){
 
 }
 
-int remove(Lista *lista, long long grau) {
+int remove_elemento(Lista *lista, long long grau) {
 
     if (lista == NULL || lista->inicio == NULL) {
         return ERRO;
@@ -257,7 +259,7 @@ int removemenor(Lista *lista) {
 
     Termo *remover = atual->proximo;
 
-    atual->proximo = NULL
+    atual->proximo = NULL;
 
     free(remover);
 

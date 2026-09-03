@@ -58,23 +58,25 @@ int main() {
             listas[quantidade_listas] = resultado;
             quantidade_listas++;
         }
-        if (strcmp(comando, "COEF")){
-            char nome_lista[2], long long coeficiente;
+        if (strcmp(comando, "COEF")==0){
+            char nome_lista[2];
+            long long coeficiente;
             scanf("%s %lld", nome_lista, &coeficiente);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome_lista[0]);
             long long resultado = busca_coeficiente(lista, coeficiente);
             printf("%lld\n", resultado);
         }
-        if (strcmp(comando, "REMOVE")){
-            int grau, char nome[2];
+        if (strcmp(comando, "REMOVE")==0){
+            int grau;
+            char nome[2];
             scanf("%s %d", nome, &grau);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
-            int flag = remove(lista, grau);
+            int flag = remove_elemento(lista, grau);
             if (flag == -1){
                 printf("ERRO\n");
             }
         }
-        if (strcmp(comando, "REMOVEMENOR")){
+        if (strcmp(comando, "REMOVEMENOR")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
