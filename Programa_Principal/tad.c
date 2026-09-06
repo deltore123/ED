@@ -291,3 +291,17 @@ int escala (Lista *lista, long long int escala){
 
     return 0;
 }
+
+void imprime(Lista *lista){
+    // Define o primeiro termo como o primeiro da lista
+    Termo *atual = lista->inicio;
+    // Itera sobre todos os termos
+    for(int i =0; i<lista->quantidade; i++){
+        // Imprime coeficiente, "X" e o expoente nessa ordem
+        printf("%lld", atual->coeficiente);
+        printf("X");
+        printf("%lld", atual->expoente);
+        // Passa para o próximo termo
+        atual = atual->proximo;
+    }
+}
