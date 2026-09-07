@@ -306,6 +306,23 @@ void imprime(Lista *lista){
     }
 }
 
+// Termo atual é o primeiro termo da lista
+void imprime_inv_recursiva(Termo *atual) {
+    // Caso Base ( se for nulo passou do fim da lista)
+    if ( atual == NULL){
+        return; 
+    }
+
+    // Faz chamada recursiva para impirmir o próximo
+    imprime_inv_recursiva(atual->proximo); 
+
+    // Agora que já imprimiu o próximo imprime o atual
+    printf("%lld*x^%lld ", atual->coeficiente, atual->expoente); 
+    
+    return;
+}
+
+
 int compara_string (char string1[], char string2[]){
     int i=0;
     while (string1[i] != '\0' && string2[i] != '\0'){
