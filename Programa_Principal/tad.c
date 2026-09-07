@@ -372,6 +372,7 @@ Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){
         t1 = t1->proximo;
     }
 
+    // Função retorna o ponteiro da nova lista
     return resultado;
 
 
