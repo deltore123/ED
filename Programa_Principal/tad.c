@@ -305,3 +305,17 @@ void imprime(Lista *lista){
         atual = atual->proximo;
     }
 }
+
+int compara_string (char string1[], char string2[]){
+    int i=0;
+    while (string1[i] != '\0' && string2[i] != '\0'){
+        if (string1[i] != string2[i]){
+            return 1;
+        }
+        i++;
+    }
+    if (string1[i] != string2[i]){
+            return 1;
+        }
+    return 0;
+}

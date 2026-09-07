@@ -19,11 +19,11 @@ int main() {
 
         scanf("%s", comando);
 
-        if (strcmp(comando, "FIM") == 0) {
+        if (compara_string(comando, "FIM") == 0) {
             break;
         }
 
-        if (strcmp(comando, "DEF") == 0) {
+        if (compara_string(comando, "DEF") == 0) {
 
             int linhas;
 
@@ -45,7 +45,7 @@ int main() {
             quantidade_listas++;
         }
 
-        if (strcmp(comando, "SOMA") == 0){
+        if (compara_string(comando, "SOMA") == 0){
             char nome[2], nome_2[2], nome_resultado[2];
             scanf("%s %s %s", nome, nome_2, nome_resultado);
             Lista *lista1= encontra_listas(listas, quantidade_listas, nome[0]);
@@ -58,7 +58,7 @@ int main() {
             listas[quantidade_listas] = resultado;
             quantidade_listas++;
         }
-        if (strcmp(comando, "COEF")==0){
+        if (compara_string(comando, "COEF")==0){
             char nome_lista[2];
             long long coeficiente;
             scanf("%s %lld", nome_lista, &coeficiente);
@@ -66,7 +66,7 @@ int main() {
             long long resultado = busca_coeficiente(lista, coeficiente);
             printf("%lld\n", resultado);
         }
-        if (strcmp(comando, "REMOVE")==0){
+        if (compara_string(comando, "REMOVE")==0){
             int grau;
             char nome[2];
             scanf("%s %d", nome, &grau);
@@ -76,7 +76,7 @@ int main() {
                 printf("ERRO\n");
             }
         }
-        if (strcmp(comando, "REMOVEMENOR")==0){
+        if (compara_string(comando, "REMOVEMENOR")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);

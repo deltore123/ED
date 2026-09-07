@@ -46,7 +46,7 @@ void imprime_inv(Lista *lista);
 // Função LIBERA: Devolve a memória utilizada pela lista
 void libera(Lista *lista);
 
-
+int compara_string (char string1[], char string2[]);
 
 #endif
 
