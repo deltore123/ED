@@ -336,3 +336,43 @@ int compara_string (char string1[], char string2[]){
         }
     return 0;
 }
+
+// Retorna ponteiro para nova lista resultante da multiplicação das outras duas
+Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){
+    // Verifica se alguma das listas é nula
+     if (lista1 == NULL || lista2 == NULL) {
+        return NULL;
+    }
+
+    // Cria a lista que conterá resultado da multiplicação
+    Lista *resultado = cria_lista(nome_resultado);
+    
+    // Verifica se lista foi criada com sucesso
+    if (resultado == NULL) {
+        return NULL;
+    
+
+    // Duas iterações aninhadas para fazer a multiplicação de todos os elementos
+    Termo *t1 = lista1->inicio;
+    while(t1!= NULL){
+        Termo *t2 = lista2->inicio;
+        while (t2!=NULL){
+            // Calcula expoente e coeficiente do termo resultante da multiplicação
+            long long expoente = t1->expoente + t2->expoente;
+            long long coeficiente = t1->coeficiente * t2->coeficiente;
+            // Usa função adiciona elemento para adicionar na lista de resultad
+            // Essa função já vai fazer a organização dos elementos automaticamente
+            adiciona_elemento(resultado, coeficiente, expoenet);  
+            
+            // Muda t2 para o próximo termo
+            t2 = t2->proximo;
+        }
+        
+        // Muda t1 para próximo termo 
+        t1 = t1->proximo;
+    }
+
+    return resultado;
+
+
+}
