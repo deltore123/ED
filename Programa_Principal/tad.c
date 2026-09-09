@@ -362,7 +362,7 @@ Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){
             long long coeficiente = t1->coeficiente * t2->coeficiente;
             // Usa função adiciona elemento para adicionar na lista de resultad
             // Essa função já vai fazer a organização dos elementos automaticamente
-            adiciona_elemento(resultado, coeficiente, expoenet);  
+            adiciona_elemento(resultado, coeficiente, expoente);  
             
             // Muda t2 para o próximo termo
             t2 = t2->proximo;
@@ -376,4 +376,20 @@ Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){
     return resultado;
 
 
+}
+
+void libera(Lista *lista){
+    if (lista == NULL) {
+        return;
+    }
+
+    Termo *atual = lista->inicio;
+
+    while (atual != NULL) {
+        Termo *proximo = atual->proximo;
+        free(atual);
+        atual = proximo;
+    }
+
+    free(lista);
 }
