@@ -32,50 +32,82 @@ Lista *cria_lista(char chave) {
     return lista;
 }
 
-int adiciona_elemento (Lista *lista, long long coeficiente, long long expoente){
-    if (lista == NULL){
-        return ERRO;
-    }
-    Termo *novo = malloc(sizeof(Termo));
-    if (novo == NULL){
+int adiciona_elemento(Lista *lista, long long coeficiente, long long expoente) {
+
+    if (lista == NULL) {
         return ERRO;
     }
 
-    if (lista->inicio == NULL){
+    Termo *novo = malloc(sizeof(Termo));
+
+    if (novo == NULL) {
+        return ERRO;
+    }
+
+    /* Lista vazia */
+    if (lista->inicio == NULL) {
         novo->coeficiente = coeficiente;
         novo->expoente = expoente;
         novo->proximo = NULL;
+
         lista->inicio = novo;
         lista->quantidade++;
+
         return 0;
     }
 
-    if (expoente > lista->inicio->expoente) {
-        novo->proximo = lista->inicio;
-        lista->inicio = novo;
-        lista->quantidade++;
-        return 0;
-    }
-
-    
+    /* Procura expoente já existente */
     Termo *atual = lista->inicio;
 
-    if (atual == NULL){
-        return ERRO;
-    }
+    while (atual != NULL) {
 
+        if (atual->expoente == expoente) {
 
-    while (atual->proximo != NULL && atual->proximo->expoente > expoente){
+            atual->coeficiente += coeficiente;
+
+            if (atual->coeficiente == 0) {
+                remove_elemento(lista, atual->expoente);
+            }
+
+            free(novo);
+            return 0;
+        }
+
         atual = atual->proximo;
     }
 
+    /* Novo termo será o primeiro */
+    if (expoente > lista->inicio->expoente) {
+
+        novo->coeficiente = coeficiente;
+        novo->expoente = expoente;
+        novo->proximo = lista->inicio;
+
+        lista->inicio = novo;
+        lista->quantidade++;
+
+        return 0;
+    }
+
+    /* Volta para o início */
+    atual = lista->inicio;
+
+    /* Procura a posição correta */
+    while (atual->proximo != NULL &&
+           atual->proximo->expoente > expoente) {
+
+        atual = atual->proximo;
+    }
+
+    novo->coeficiente = coeficiente;
+    novo->expoente = expoente;
     novo->proximo = atual->proximo;
-    atual->proximo = novo;  
+
+    atual->proximo = novo;
 
     lista->quantidade++;
 
     return 0;
-
 }
 
 Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
@@ -85,7 +117,6 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
     }
 
     Lista *resultado = cria_lista(nome_resultado);
-    resultado->nome = nome_resultado;
     if (resultado == NULL) {
         return NULL;
     }
@@ -161,31 +192,40 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
     return resultado;
 }
 
-Lista *encontra_listas (Lista **lista, int quantidade, char nome){
-    int i=0;
-    while(i < quantidade && lista[i]->nome != nome){
+Lista *encontra_listas(Lista **lista, int quantidade, char nome) {
+
+    int i = 0;
+
+    while (i < quantidade &&
+           lista[i] != NULL &&
+           lista[i]->nome != nome) {
+
         i++;
     }
-    if (i == quantidade) {
+
+    if (i == quantidade || lista[i] == NULL) {
         return NULL;
     }
+
     return lista[i];
 }
 
-int busca_coeficiente (Lista *lista, int expoente){
-    Termo *atual = lista->inicio;
-    for (int i=0; i<lista->quantidade; i++){
-        if (atual->expoente != expoente){
-            atual = atual->proximo;
-        }
+int busca_coeficiente(Lista *lista, int expoente) {
+    if (lista == NULL) {
+        return ERRO;
+    }
 
+    Termo *atual = lista->inicio;
+
+    while (atual != NULL) {
         if (atual->expoente == expoente) {
             return atual->coeficiente;
         }
 
+        atual = atual->proximo;
     }
-    return ERRO;
 
+    return ERRO;
 }
 
 int remove_elemento(Lista *lista, long long grau) {
@@ -273,9 +313,12 @@ int removemenor(Lista *lista) {
     return 0;
 }
 
-long long int grau (Lista *lista){
-    Termo *inicio = lista->inicio;
-    return inicio->expoente;
+long long int grau(Lista *lista) {
+    if (lista == NULL || lista->inicio == NULL) {
+        return ERRO;
+    }
+
+    return lista->inicio->expoente;
 }
 
 int escala (Lista *lista, long long int escala){
@@ -290,6 +333,7 @@ int escala (Lista *lista, long long int escala){
 
     while (atual!=NULL){
         atual->coeficiente = atual->coeficiente*escala;
+        atual = atual->proximo;
     }
 
     return 0;
