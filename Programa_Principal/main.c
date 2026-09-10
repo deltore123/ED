@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "tad.h"
 
 #define MAX_LISTAS 100
@@ -23,7 +24,7 @@ int main() {
             break;
         }
 
-        if (compara_string(comando, "DEF") == 0) {
+        else if (compara_string(comando, "DEF") == 0) {
 
             int linhas;
 
@@ -45,68 +46,98 @@ int main() {
             quantidade_listas++;
         }
 
-        if (compara_string(comando, "SOMA") == 0){
+        else if (compara_string(comando, "SOMA") == 0){
             char nome[2], nome_2[2], nome_resultado[2];
             scanf("%s %s %s", nome, nome_2, nome_resultado);
             Lista *lista1= encontra_listas(listas, quantidade_listas, nome[0]);
             Lista *lista2 = encontra_listas(listas, quantidade_listas, nome_2[0]);
             if (lista1 == NULL || lista2 == NULL){
-                printf("alguma das listas nao existe\n");
-                continue;
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
             }
             Lista *resultado = soma_listas(lista1, lista2, nome_resultado[0]);
             listas[quantidade_listas] = resultado;
             quantidade_listas++;
         }
-        if (compara_string(comando, "COEF")==0){
+        else if (compara_string(comando, "COEF")==0){
             char nome_lista[2];
             long long coeficiente;
             scanf("%s %lld", nome_lista, &coeficiente);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome_lista[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             long long resultado = busca_coeficiente(lista, coeficiente);
             printf("%lld\n", resultado);
         }
-        if (compara_string(comando, "REMOVE")==0){
+        else if (compara_string(comando, "REMOVE")==0){
             int grau;
             char nome[2];
             scanf("%s %d", nome, &grau);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             int flag = remove_elemento(lista, grau);
             if (flag == -1){
                 printf("ERRO\n");
             }
         }
-        if (compara_string(comando, "REMOVEMENOR")==0){
+        else if (compara_string(comando, "REMOVEMENOR")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             removemenor(lista);
         }
-        if (compara_string(comando, "GRAU")==0){
+        else if (compara_string(comando, "GRAU")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             printf("%lld\n", grau(lista));
         }
-        if (compara_string(comando, "IMPRIME")==0){
+        else if (compara_string(comando, "IMPRIME")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             imprime(lista);
             printf("\n");
         }
-        if (compara_string(comando, "IMPRIMEINV")==0){
+        else if (compara_string(comando, "IMPRIMEINV")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             imprime_inv(lista);
             printf("\n");
         }
-        if (compara_string(comando, "LIBERA")==0){
+        else if (compara_string(comando, "LIBERA")==0){
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
             libera(lista);
+        } else {
+            exit(3);
         }
     }
 

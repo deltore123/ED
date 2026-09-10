@@ -163,8 +163,11 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
 
 Lista *encontra_listas (Lista **lista, int quantidade, char nome){
     int i=0;
-    while(lista[i]->nome != nome && i<quantidade){
+    while(i < quantidade && lista[i]->nome != nome){
         i++;
+    }
+    if (i == quantidade) {
+        return NULL;
     }
     return lista[i];
 }
