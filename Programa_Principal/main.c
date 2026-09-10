@@ -80,7 +80,33 @@ int main() {
             char nome[2];
             scanf("%s", nome);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
-            
+            removemenor(lista);
+        }
+        if (compara_string(comando, "GRAU")==0){
+            char nome[2];
+            scanf("%s", nome);
+            Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            printf("%lld\n", grau(lista));
+        }
+        if (compara_string(comando, "IMPRIME")==0){
+            char nome[2];
+            scanf("%s", nome);
+            Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            imprime(lista);
+            printf("\n");
+        }
+        if (compara_string(comando, "IMPRIMEINV")==0){
+            char nome[2];
+            scanf("%s", nome);
+            Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            imprime_inv(lista);
+            printf("\n");
+        }
+        if (compara_string(comando, "LIBERA")==0){
+            char nome[2];
+            scanf("%s", nome);
+            Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            libera(lista);
         }
     }
 

@@ -163,7 +163,7 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
 
 Lista *encontra_listas (Lista **lista, int quantidade, char nome){
     int i=0;
-    while(lista[0]->nome != nome && i<quantidade){
+    while(lista[i]->nome != nome && i<quantidade){
         i++;
     }
     return lista[i];
@@ -322,6 +322,13 @@ void imprime_inv_recursiva(Termo *atual) {
     return;
 }
 
+void imprime_inv(Lista *lista) {
+    if (lista == NULL || lista->inicio == NULL) {
+        printf("0");
+        return;
+    }
+    imprime_inv_recursiva(lista->inicio);
+}
 
 int compara_string (char string1[], char string2[]){
     int i=0;
