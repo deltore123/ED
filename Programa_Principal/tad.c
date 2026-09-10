@@ -350,7 +350,7 @@ Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){
     // Verifica se lista foi criada com sucesso
     if (resultado == NULL) {
         return NULL;
-    
+    }
 
     // Duas iterações aninhadas para fazer a multiplicação de todos os elementos
     Termo *t1 = lista1->inicio;
