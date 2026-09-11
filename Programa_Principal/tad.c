@@ -33,7 +33,9 @@ Lista *cria_lista(char chave) {
 }
 
 int adiciona_elemento(Lista *lista, long long coeficiente, long long expoente) {
-
+    if (coeficiente==0){
+        return ERRO;
+    }
     if (lista == NULL) {
         return ERRO;
     }
@@ -212,7 +214,7 @@ Lista *encontra_listas(Lista **lista, int quantidade, char nome) {
 
 long long busca_coeficiente(Lista *lista, long long expoente) {
     if (lista == NULL) {
-        return ERRO;
+        return 0;
     }
 
     Termo *atual = lista->inicio;
@@ -225,7 +227,7 @@ long long busca_coeficiente(Lista *lista, long long expoente) {
         atual = atual->proximo;
     }
 
-    return ERRO;
+    return 0;
 }
 
 int remove_elemento(Lista *lista, long long grau) {

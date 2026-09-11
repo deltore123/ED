@@ -80,10 +80,8 @@ int main() {
                 fprintf(stderr, "erro: polinomio nao definido\n");
                 exit(2);
             }
-            int flag = remove_elemento(lista, grau);
-            if (flag == -1){
-                printf("ERRO\n");
-            }
+            remove_elemento(lista, grau);
+            
         }
         else if (compara_string(comando, "REMOVEMENOR")==0){
             char nome[2];
