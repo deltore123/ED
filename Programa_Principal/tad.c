@@ -210,7 +210,7 @@ Lista *encontra_listas(Lista **lista, int quantidade, char nome) {
     return lista[i];
 }
 
-int busca_coeficiente(Lista *lista, int expoente) {
+long long busca_coeficiente(Lista *lista, int expoente) {
     if (lista == NULL) {
         return ERRO;
     }
@@ -330,7 +330,19 @@ int escala (Lista *lista, long long int escala){
     if (atual == NULL){
         return ERRO;
     }
-
+    if (escala == 0 && atual != NULL){
+        Termo *remove = lista->inicio;
+        atual = atual->proximo;
+        while (atual!=NULL){
+            free (remove);
+            remove = atual;
+            atual=atual->proximo;
+        }
+        free(remove);
+        lista->inicio= NULL;
+        lista->quantidade= 0;
+        return 0;
+    }
     while (atual!=NULL){
         atual->coeficiente = atual->coeficiente*escala;
         atual = atual->proximo;
