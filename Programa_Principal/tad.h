@@ -20,7 +20,7 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado);
 Lista *encontra_listas (Lista **lista, int quantidade, char nome);
 
 // Função COEF: Dado um exponete, retorna o coeficiente associado a ele 
-int busca_coeficiente (Lista *lista, int expoente);
+long long busca_coeficiente (Lista *lista, long long expoente);
 
 //  Função REMOVE: Remove o elemento de grau x da lista fornecida
 int remove_elemento(Lista *lista, long long grau);

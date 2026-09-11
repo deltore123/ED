@@ -210,7 +210,7 @@ Lista *encontra_listas(Lista **lista, int quantidade, char nome) {
     return lista[i];
 }
 
-long long busca_coeficiente(Lista *lista, int expoente) {
+long long busca_coeficiente(Lista *lista, long long expoente) {
     if (lista == NULL) {
         return ERRO;
     }
