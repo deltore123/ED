@@ -37,10 +37,10 @@ void gera_polinomio(char nome){
     // Libera a memória do vetor auxiliar
     free(graus);
 
-    // Gerar os comandos de escala
-    for(int i=0; i<20000;i++){
-        int c = (rand() % 1000) + 1;
-        printf("ESCALA %c %d\n",nome,c);
+    // Gerar 20.000 comandos de escala com c sendo -1 ou 1
+    for (int i = 0; i < 20000; i++) {
+        int c = (rand() % 2 == 0) ? -1 : 1;
+        printf("ESCALA %c %d\n", nome, c);
     }
 }
 
