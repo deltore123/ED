@@ -8,21 +8,21 @@ typedef struct Lista Lista;
 // Obs: As funcionalidades da função Fim ja foram implementadas diretamente na main, por ela isso não está declarada aqui
 
 // Função DEF: Usada para criar uma lista e definir seu nome
-Lista *cria_lista(char chave); 
+Lista *cria_lista(char *chave); 
 
 // Função ADD: Adiciona um elemento à Lista 
 int adiciona_elemento(Lista *lista,long long coeficiente,long long expoente); 
 
 // Função SOMA: Soma duas Listas
-Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado);
+Lista *soma_listas(Lista *lista1, Lista *lista2, char *nome_resultado);
 
 // Função Auxiliar que busca o ponteiro para a lista baseado no seu nome em uma lista de listas ( dai a dupla dereferenciação)
-Lista *encontra_listas (Lista **lista, int quantidade, char nome);
+Lista *encontra_listas (Lista **lista, int quantidade, char *nome);
 
 // Função Auxiliar que retorna o índice onde a nova lista deve ser inserida,
 // liberando a lista pré-existente com o mesmo nome se houver.
 // Incrementa *quantidade se o nome for novo.
-int insere_ou_substitui(Lista **listas, int *quantidade, char nome, int max_listas);
+int insere_ou_substitui(Lista **listas, int *quantidade, char *nome, int max_listas);
 
 // Função COEF: Dado um exponete, retorna o coeficiente associado a ele 
 long long busca_coeficiente (Lista *lista, long long expoente);
@@ -40,7 +40,7 @@ int escala (Lista *lista, long long int escala);
 int removemenor(Lista *lista);
 
 // Função PROD: Realiza a multiplicação de dois polinômios
-Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado);
+Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado);
 
 // Função IMPRIME: Imprime o polinômio formatado corretamente
 void imprime(Lista *lista);

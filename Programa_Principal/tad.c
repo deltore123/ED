@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "tad.h"
 
 
@@ -12,13 +13,13 @@ typedef struct Termo{
 
 typedef struct Lista {
     Termo *inicio;
-    char nome;
+    char nome[33];
     int quantidade;
 } Lista;
 
 
 
-Lista *cria_lista(char chave) {
+Lista *cria_lista(char *chave) {
     // Aloca espaço para a lista dinâmicamente
     Lista *lista = malloc(sizeof(Lista));
 
@@ -27,7 +28,7 @@ Lista *cria_lista(char chave) {
         return NULL;
     }
    
-    lista->nome = chave;
+    strcpy(lista->nome, chave);
     lista->quantidade = 0;
     lista->inicio=NULL;
     return lista;
@@ -95,7 +96,7 @@ int adiciona_elemento(Lista *lista, long long coeficiente, long long expoente) {
     return 0;
 }
 
-Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
+Lista *soma_listas(Lista *lista1, Lista *lista2, char *nome_resultado) {
 
     if (lista1 == NULL || lista2 == NULL) {
         return NULL;
@@ -167,16 +168,18 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado) {
     return resultado;
 }
 
-Lista *encontra_listas(Lista **lista, int quantidade, char nome) {
-    for (int i = 0; i < quantidade; i++) {
-        if (lista[i] != NULL && lista[i]->nome == nome) {
+Lista *encontra_listas(Lista **lista, int quantidade, char *nome) {
+    int i = 0;
+    while (i < quantidade) {
+        if (lista[i] != NULL && strcmp(lista[i]->nome, nome) == 0) {
             return lista[i];
         }
+        i++;
     }
     return NULL;
 }
 
-int insere_ou_substitui(Lista **listas, int *quantidade, char nome, int max_listas) {
+int insere_ou_substitui(Lista **listas, int *quantidade, char *nome, int max_listas) {
     Lista *existente = encontra_listas(listas, *quantidade, nome);
 
     if (existente != NULL) {
@@ -375,7 +378,7 @@ void imprime_inv(Lista *lista) {
 
 
 // Retorna ponteiro para nova lista resultante da multiplicação das outras duas
-Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){
+Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado){
     // Verifica se alguma das listas é nula
      if (lista1 == NULL || lista2 == NULL) {
         return NULL;
