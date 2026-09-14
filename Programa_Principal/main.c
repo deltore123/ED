@@ -10,9 +10,6 @@ int main() {
     char comando[20];
     char nome[20];
 
-    int expoente;
-    int coeficiente;
-
     Lista *listas[MAX_LISTAS];
     int quantidade_listas = 0;
 
@@ -20,30 +17,40 @@ int main() {
 
         scanf("%s", comando);
 
-        if (compara_string(comando, "FIM") == 0) {
+        if (strcmp(comando, "FIM") == 0) {
             break;
         }
 
-        else if (compara_string(comando, "DEF") == 0) {
-
+        else if (strcmp(comando, "DEF") == 0) {
             int linhas;
-
             scanf("%s %d", nome, &linhas);
 
-            listas[quantidade_listas] = cria_lista(nome[0]);
-
-            for (int i = 0; i < linhas; i++) {
-
-                scanf("%d %d", &coeficiente, &expoente);
-
-                adiciona_elemento(
-                    listas[quantidade_listas],
-                    coeficiente,
-                    expoente
-                );
+            // Verifica se já existe lista com esse nome
+            Lista *lista_existente = encontra_listas(listas, quantidade_listas, nome[0]);
+            int indice_alvo = -1;
+            
+            if (lista_existente != NULL) {
+                // Procura a lista com esse nome na lista de listas
+                for (int i = 0; i < quantidade_listas; i++) {
+                    if (listas[i] == lista_existente) {
+                        indice_alvo = i;
+                        break;
+                    }
+                }
+                // Libera a lista pré-existente
+                libera(lista_existente);
+            } else {
+                indice_alvo = quantidade_listas;
+                quantidade_listas++;
             }
 
-            quantidade_listas++;
+            listas[indice_alvo] = cria_lista(nome[0]);
+
+            for (int i = 0; i < linhas; i++) {
+                long long coef, exp;
+                scanf("%lld %lld", &coef, &exp);
+                adiciona_elemento(listas[indice_alvo], coef, exp);
+            }
         }
 
         else if (strcmp(comando, "SOMA") == 0){
@@ -56,8 +63,45 @@ int main() {
                 exit(2);
             }
             Lista *resultado = soma_listas(lista1, lista2, nome_resultado[0]);
-            listas[quantidade_listas] = resultado;
-            quantidade_listas++;
+
+            // Verifica se já existe lista com o nome do resultado
+            Lista *existente = encontra_listas(listas, quantidade_listas, nome_resultado[0]);
+            int indice_alvo = -1;
+            if (existente != NULL) {
+                for (int i = 0; i < quantidade_listas; i++) {
+                    if (listas[i] == existente) {
+                        indice_alvo = i;
+                        break;
+                    }
+                }
+                libera(existente);
+            } else {
+                indice_alvo = quantidade_listas;
+                quantidade_listas++;
+            }
+            listas[indice_alvo] = resultado;
+        }
+        else if (strcmp(comando, "ADD") == 0){
+            char nome[2];
+            long long coef, exp;
+            scanf("%s %lld %lld", nome, &coef, &exp);
+            Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
+            adiciona_elemento(lista, coef, exp);
+        }
+        else if (strcmp(comando, "ESCALA") == 0){
+            char nome[2];
+            long long valor_escala;
+            scanf("%s %lld", nome, &valor_escala);
+            Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
+            if (lista == NULL) {
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
+            }
+            escala(lista, valor_escala);
         }
         else if (strcmp(comando, "COEF")==0){
             char nome_lista[2];
@@ -72,9 +116,9 @@ int main() {
             printf("%lld\n", resultado);
         }
         else if (strcmp(comando, "REMOVE")==0){
-            int grau;
+            long long grau;
             char nome[2];
-            scanf("%s %d", nome, &grau);
+            scanf("%s %lld", nome, &grau);
             Lista *lista = encontra_listas(listas, quantidade_listas, nome[0]);
             if (lista == NULL) {
                 fprintf(stderr, "erro: polinomio nao definido\n");
@@ -133,77 +177,51 @@ int main() {
                 fprintf(stderr, "erro: polinomio nao definido\n");
                 exit(2);
             }
+            // Anula o ponteiro no array antes de liberar
+            for (int i = 0; i < quantidade_listas; i++) {
+                if (listas[i] == lista) {
+                    listas[i] = NULL;
+                    break;
+                }
+            }
             libera(lista);
         } 
 
         else if(strcmp(comando, "PROD")==0){
             // Escaneando nomes das listas a serem multiplicadas
-            char nome1[2], nome2[2];
-            scanf("%s %s", nome1, nome2);
+            char nome1[2], nome2[2], nome3[2];
+            scanf("%s %s %s", nome1, nome2, nome3);
 
             // Encontrando listas, na lista de listas
             Lista *lista1 = encontra_listas(listas, quantidade_listas, nome1[0]);
             Lista *lista2 = encontra_listas(listas, quantidade_listas, nome2[0]);
 
             // Caso algumas delas não exista o programa não faz nada
-            if( lista1 == NULL && lista2 = NULL){
-                printf("Alguma das listas não existe");
-                break;
+            if( lista1 == NULL || lista2 == NULL){
+                fprintf(stderr, "erro: polinomio nao definido\n");
+                exit(2);
             }
 
-            // Caso ambas as litas existam chama a função multiplicação
-            else{
-                // Escaneia nome que será dado a lista 
-                char nome3[2];
-                scanf("%s", nome3);
+            // Chamada da função e armazenamento do resultado
+            Lista *resultado = prod(lista1, lista2, nome3[0]);
 
-                // Chamda da função
-                Lista *lista = prod(lista1, lista2, nome3[0]);
+            // Verifica se já existe lista com o nome do resultado
+            Lista *existente = encontra_listas(listas, quantidade_listas, nome3[0]);
+            int indice_alvo = -1;
+            if (existente != NULL) {
+                for (int i = 0; i < quantidade_listas; i++) {
+                    if (listas[i] == existente) {
+                        indice_alvo = i;
+                        break;
+                    }
+                }
+                libera(existente);
+            } else {
+                indice_alvo = quantidade_listas;
+                quantidade_listas++;
             }
+            listas[indice_alvo] = resultado;
         }
-
-        else if(strcmp(comando, "IMPRIME")==0){
-            // Escaneando lista a ser impressa
-            char nome[2];
-            scanf("%s", nome);
-
-            // Buscando a lista
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-
-            // Verificação 
-            if ( lista == NULL){
-                printf("Lista não existe");
-                break;
-            }
-
-            // Chamando a função
-            else{
-                imprime(lista);
-            }
-           
-        }
-
-        else if(strcmp(comando, "IMPRIMEINV")==0){
-               // Escaneando lista a ser impressa
-            char nome[2];
-            scanf("%s", nome);
-
-            // Buscando a lista
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-
-            // Verificação 
-            if ( lista == NULL){
-                printf("Lista não existe");
-                break;
-            }
-
-            // Chamando a função
-            else{
-                imprime_inv(lista);
-            }
-           
-        }
-        
         else {
             exit(3);
         }

@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include "tad.h"
 
-#define ERRO -1
-#define BOOLEANO int
+
 
 typedef struct Termo{
     long long coeficiente;
@@ -20,12 +19,14 @@ typedef struct Lista {
 
 
 Lista *cria_lista(char chave) {
+    // Aloca espaço para a lista dinâmicamente
     Lista *lista = malloc(sizeof(Lista));
 
+    // Verifica se espaço foi alocado corretamente
     if (lista == NULL) {
         return NULL;
     }
- 
+   
     lista->nome = chave;
     lista->quantidade = 0;
     lista->inicio=NULL;
@@ -354,33 +355,33 @@ int escala (Lista *lista, long long int escala){
 }
 
 void imprime(Lista *lista){
-    // Define o primeiro termo como o primeiro da lista
+    if (lista == NULL || lista->inicio == NULL) {
+        printf("0");
+        return;
+    }
     Termo *atual = lista->inicio;
-    // Itera sobre todos os termos
-    for(int i =0; i<lista->quantidade; i++){
-        // Imprime coeficiente, "X" e o expoente nessa ordem
-        printf("%lld", atual->coeficiente);
-        printf("X");
-        printf("%lld", atual->expoente);
-        // Passa para o próximo termo
+    while (atual != NULL) {
+        printf("%lld*x^%lld", atual->coeficiente, atual->expoente);
         atual = atual->proximo;
+        if (atual != NULL) {
+            printf(" ");
+        }
     }
 }
 
-// Termo atual é o primeiro termo da lista
+// Para o imprime_inv, vamos evitar espaço sobrando no final
 void imprime_inv_recursiva(Termo *atual) {
-    // Caso Base ( se for nulo passou do fim da lista)
-    if ( atual == NULL){
+    if (atual == NULL){
         return; 
     }
-
-    // Faz chamada recursiva para impirmir o próximo
-    imprime_inv_recursiva(atual->proximo); 
-
-    // Agora que já imprimiu o próximo imprime o atual
-    printf("%lld*x^%lld ", atual->coeficiente, atual->expoente); 
     
-    return;
+    // Passa 0 pois o próximo a ser impresso mais a fundo não será o primeiro a ser exibido (a menos que não haja mais)
+    imprime_inv_recursiva(atual->proximo); 
+    
+    if (atual->proximo != NULL) {
+        printf(" ");
+    }
+    printf("%lld*x^%lld", atual->coeficiente, atual->expoente); 
 }
 
 void imprime_inv(Lista *lista) {
@@ -391,19 +392,6 @@ void imprime_inv(Lista *lista) {
     imprime_inv_recursiva(lista->inicio);
 }
 
-int compara_string (char string1[], char string2[]){
-    int i=0;
-    while (string1[i] != '\0' && string2[i] != '\0'){
-        if (string1[i] != string2[i]){
-            return 1;
-        }
-        i++;
-    }
-    if (string1[i] != string2[i]){
-            return 1;
-        }
-    return 0;
-}
 
 // Retorna ponteiro para nova lista resultante da multiplicação das outras duas
 Lista *prod(Lista *lista1, Lista *lista2, char nome_resultado){

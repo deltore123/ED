@@ -46,8 +46,5 @@ void imprime_inv(Lista *lista);
 // Função LIBERA: Devolve a memória utilizada pela lista
 void libera(Lista *lista);
 
-// Função auxiliar que subistui a strcmp ( já que não podemos usar string.h)
-int compara_string (char string1[], char string2[]);
-
 #endif
 
