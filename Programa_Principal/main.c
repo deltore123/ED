@@ -24,26 +24,35 @@ int main() {
         }
 
         else if (strcmp(comando, "DEF") == 0) {
-            int linhas;
+             int linhas;
             scanf("%32s %d", nome, &linhas);
 
-            // DEF
             int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome);
+
             if (indice_alvo == -1) {
             for (int i = 0; i < linhas; i++) {
-                long long coef, exp;
-                scanf("%lld %lld", &coef, &exp); // consome a entrada mesmo descartando
+                    long long coef, exp;
+                 scanf("%lld %lld", &coef, &exp);
             }
                 continue;
+            }   
+
+            TermoEntrada *termos = malloc(linhas * sizeof(TermoEntrada));
+
+            if (termos == NULL) {
+                break;
             }
-            listas[indice_alvo] = cria_lista(nome);
 
             for (int i = 0; i < linhas; i++) {
-                long long coef, exp;
-                scanf("%lld %lld", &coef, &exp);
-                adiciona_elemento(listas[indice_alvo], coef, exp);
+                scanf("%lld %lld",
+                    &termos[i].coeficiente,
+                    &termos[i].expoente);
+                }
+
+            listas[indice_alvo] = cria_lista_def(nome, termos, linhas);
+
+            free(termos);
             }
-        }
 
         else if (strcmp(comando, "SOMA") == 0){
             char nome[33], nome_2[33], nome_resultado[33];

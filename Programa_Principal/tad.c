@@ -5,8 +5,6 @@
 
 #define MAX_LISTAS 512
 
-
-
 typedef struct Termo{
     long long coeficiente;
     long long expoente;
@@ -19,6 +17,69 @@ typedef struct Lista {
     int quantidade;
 } Lista;
 
+int compara_termos(const void *a, const void *b)
+{
+    const TermoEntrada *t1 = a;
+    const TermoEntrada *t2 = b;
+
+    if (t1->expoente < t2->expoente)
+        return 1;
+
+    if (t1->expoente > t2->expoente)
+        return -1;
+
+    return 0;
+}
+
+Lista *cria_lista_def(char *nome, TermoEntrada termos[], int quantidade)
+{
+    Lista *lista = cria_lista(nome);
+
+    if (lista == NULL)
+        return NULL;
+
+    qsort(termos, quantidade, sizeof(TermoEntrada), compara_termos);
+
+    Termo *cauda = NULL;
+
+    int i = 0;
+
+    while (i < quantidade) {
+
+        long long expoente = termos[i].expoente;
+        long long coeficiente = 0;
+
+        while (i < quantidade && termos[i].expoente == expoente) {
+            coeficiente += termos[i].coeficiente;
+            i++;
+        }
+
+        if (coeficiente == 0)
+            continue;
+
+        Termo *novo = malloc(sizeof(Termo));
+
+        if (novo == NULL) {
+            libera(lista);
+            return NULL;
+        }
+
+        novo->coeficiente = coeficiente;
+        novo->expoente = expoente;
+        novo->proximo = NULL;
+
+        if (lista->inicio == NULL) {
+            lista->inicio = novo;
+        } else {
+            cauda->proximo = novo;
+        }
+
+        cauda = novo;
+        lista->quantidade++;
+    }
+
+    return lista;
+}
 
 
 Lista *cria_lista(char *chave) {
@@ -395,43 +456,44 @@ void imprime_inv(Lista *lista) {
     }
     lista->inicio = anterior;
 }
-
 // Retorna ponteiro para nova lista resultante da multiplicação das outras duas
 Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado){
-    // Verifica se alguma das listas é nula
-     if (lista1 == NULL || lista2 == NULL) {
+    if (lista1 == NULL || lista2 == NULL) {
         return NULL;
     }
 
-    // Cria a lista que conterá resultado da multiplicação
     Lista *resultado = cria_lista(nome_resultado);
-    
-    // Verifica se lista foi criada com sucesso
     if (resultado == NULL) {
         return NULL;
     }
 
-    // Duas iterações aninhadas para fazer a multiplicação de todos os elementos
     Termo *t1 = lista1->inicio;
-    while(t1!= NULL){
+    while(t1 != NULL){
+        // Cria uma lista temporária para guardar t1 multiplicado por todo lista2
+        Lista *temp = cria_lista("temp");
+        
         Termo *t2 = lista2->inicio;
-        while (t2!=NULL){
-            // Calcula expoente e coeficiente do termo resultante da multiplicação
+        while (t2 != NULL) {
             long long expoente = t1->expoente + t2->expoente;
             long long coeficiente = t1->coeficiente * t2->coeficiente;
-            // Usa função adiciona elemento para adicionar na lista de resultad
-            // Essa função já vai fazer a organização dos elementos automaticamente
-            adiciona_elemento(resultado, coeficiente, expoente);  
             
-            // Muda t2 para o próximo termo
+            adiciona_elemento(temp, coeficiente, expoente);
             t2 = t2->proximo;
         }
+
+        // Soma a lista temp ao nosso resultado acumulado e salva em nova variável
+        Lista *novo_resultado = soma_listas(resultado, temp, nome_resultado);
         
-        // Muda t1 para próximo termo 
+        // Destrói as listas velhas para liberar a memória
+        libera(resultado);
+        libera(temp);
+        
+        // Atualiza o ponteiro do resultado
+        resultado = novo_resultado;
+        
         t1 = t1->proximo;
     }
 
-    // Função retorna o ponteiro da nova lista
     return resultado;
 }
 

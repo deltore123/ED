@@ -3,6 +3,11 @@
 
 #define ERRO -1
 
+typedef struct {
+    long long coeficiente;
+    long long expoente;
+} TermoEntrada;
+
 typedef struct Lista Lista;
 
 // Obs: As funcionalidades da função Fim ja foram implementadas diretamente na main, por ela isso não está declarada aqui
@@ -50,5 +55,9 @@ void imprime_inv(Lista *lista);
 
 // Função LIBERA: Devolve a memória utilizada pela lista
 void libera(Lista *lista);
+
+Lista *cria_lista_def(char *nome, TermoEntrada termos[], int quantidade);
+
+int compara_termos(const void *a, const void *b);
 
 #endif
