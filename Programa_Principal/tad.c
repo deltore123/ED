@@ -218,11 +218,10 @@ long long busca_coeficiente(Lista *lista, long long expoente) {
 
     Termo *atual = lista->inicio;
 
-    while (atual != NULL) {
+    while (atual != NULL && atual->expoente >= expoente) {
         if (atual->expoente == expoente) {
             return atual->coeficiente;
         }
-
         atual = atual->proximo;
     }
 
