@@ -3,6 +3,8 @@
 #include <string.h>
 #include "tad.h"
 
+#define MAX_LISTAS 512
+
 
 
 typedef struct Termo{
@@ -179,28 +181,33 @@ Lista *encontra_listas(Lista **lista, int quantidade, char *nome) {
     return NULL;
 }
 
-int insere_ou_substitui(Lista **listas, int *quantidade, char *nome, int max_listas) {
-    Lista *existente = encontra_listas(listas, *quantidade, nome);
-
-    if (existente != NULL) {
-        // Procura o índice da lista existente
-        for (int i = 0; i < *quantidade; i++) {
-            if (listas[i] == existente) {
-                libera(existente);
-                return i;
-            }
+int insere_ou_substitui(Lista *listas[], int *quantidade_listas, const char *nome)
+{
+    // Procura se o nome já existe
+    for (int i = 0; i < *quantidade_listas; i++) {
+        if (listas[i] != NULL && strcmp(listas[i]->nome, nome) == 0) {
+            libera(listas[i]);
+            listas[i] = NULL;
+            return i;
         }
     }
 
-    // Verifica se há espaço no array
-    if (*quantidade >= max_listas) {
-        fprintf(stderr, "erro: limite de polinomios atingido\n");
-        exit(1);
+    // Procura uma posição vazia para reutilizar
+    for (int i = 0; i < *quantidade_listas; i++) {
+        if (listas[i] == NULL) {
+            return i;
+        }
     }
 
-    // Nome novo: retorna o próximo índice disponível e incrementa
-    int indice = *quantidade;
-    (*quantidade)++;
+    // Não encontrou posição vazia
+    if (*quantidade_listas >= MAX_LISTAS) {
+        return -1;
+    }
+
+    // Usa uma nova posição
+    int indice = *quantidade_listas;
+    (*quantidade_listas)++;
+
     return indice;
 }
 
