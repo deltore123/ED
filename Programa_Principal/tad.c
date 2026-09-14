@@ -181,7 +181,7 @@ Lista *encontra_listas(Lista **lista, int quantidade, char *nome) {
     return NULL;
 }
 
-int insere_ou_substitui(Lista *listas[], int *quantidade_listas, const char *nome)
+int insere_ou_substitui(Lista *listas[], int *quantidade_listas, char *nome)
 {
     // Procura se o nome já existe
     for (int i = 0; i < *quantidade_listas; i++) {

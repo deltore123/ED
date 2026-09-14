@@ -22,7 +22,7 @@ Lista *encontra_listas (Lista **lista, int quantidade, char *nome);
 // Função Auxiliar que retorna o índice onde a nova lista deve ser inserida,
 // liberando a lista pré-existente com o mesmo nome se houver.
 // Incrementa *quantidade se o nome for novo.
-int insere_ou_substitui(Lista **listas, int *quantidade, char *nome, int max_listas);
+int insere_ou_substitui(Lista **listas, int *quantidade, char *nome);
 
 // Função COEF: Dado um exponete, retorna o coeficiente associado a ele 
 long long busca_coeficiente (Lista *lista, long long expoente);
