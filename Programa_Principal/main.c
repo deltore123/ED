@@ -25,25 +25,7 @@ int main() {
             int linhas;
             scanf("%s %d", nome, &linhas);
 
-            // Verifica se já existe lista com esse nome
-            Lista *lista_existente = encontra_listas(listas, quantidade_listas, nome[0]);
-            int indice_alvo = -1;
-            
-            if (lista_existente != NULL) {
-                // Procura a lista com esse nome na lista de listas
-                for (int i = 0; i < quantidade_listas; i++) {
-                    if (listas[i] == lista_existente) {
-                        indice_alvo = i;
-                        break;
-                    }
-                }
-                // Libera a lista pré-existente
-                libera(lista_existente);
-            } else {
-                indice_alvo = quantidade_listas;
-                quantidade_listas++;
-            }
-
+            int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome[0], MAX_LISTAS);
             listas[indice_alvo] = cria_lista(nome[0]);
 
             for (int i = 0; i < linhas; i++) {
@@ -64,21 +46,7 @@ int main() {
             }
             Lista *resultado = soma_listas(lista1, lista2, nome_resultado[0]);
 
-            // Verifica se já existe lista com o nome do resultado
-            Lista *existente = encontra_listas(listas, quantidade_listas, nome_resultado[0]);
-            int indice_alvo = -1;
-            if (existente != NULL) {
-                for (int i = 0; i < quantidade_listas; i++) {
-                    if (listas[i] == existente) {
-                        indice_alvo = i;
-                        break;
-                    }
-                }
-                libera(existente);
-            } else {
-                indice_alvo = quantidade_listas;
-                quantidade_listas++;
-            }
+            int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome_resultado[0], MAX_LISTAS);
             listas[indice_alvo] = resultado;
         }
         else if (strcmp(comando, "ADD") == 0){
@@ -205,25 +173,18 @@ int main() {
             // Chamada da função e armazenamento do resultado
             Lista *resultado = prod(lista1, lista2, nome3[0]);
 
-            // Verifica se já existe lista com o nome do resultado
-            Lista *existente = encontra_listas(listas, quantidade_listas, nome3[0]);
-            int indice_alvo = -1;
-            if (existente != NULL) {
-                for (int i = 0; i < quantidade_listas; i++) {
-                    if (listas[i] == existente) {
-                        indice_alvo = i;
-                        break;
-                    }
-                }
-                libera(existente);
-            } else {
-                indice_alvo = quantidade_listas;
-                quantidade_listas++;
-            }
+            int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome3[0], MAX_LISTAS);
             listas[indice_alvo] = resultado;
         }
         else {
             exit(3);
+        }
+    }
+
+    // Libera todas as listas restantes
+    for (int i = 0; i < quantidade_listas; i++) {
+        if (listas[i] != NULL) {
+            libera(listas[i]);
         }
     }
 

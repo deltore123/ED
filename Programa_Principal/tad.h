@@ -19,6 +19,11 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char nome_resultado);
 // Função Auxiliar que busca o ponteiro para a lista baseado no seu nome em uma lista de listas ( dai a dupla dereferenciação)
 Lista *encontra_listas (Lista **lista, int quantidade, char nome);
 
+// Função Auxiliar que retorna o índice onde a nova lista deve ser inserida,
+// liberando a lista pré-existente com o mesmo nome se houver.
+// Incrementa *quantidade se o nome for novo.
+int insere_ou_substitui(Lista **listas, int *quantidade, char nome, int max_listas);
+
 // Função COEF: Dado um exponete, retorna o coeficiente associado a ele 
 long long busca_coeficiente (Lista *lista, long long expoente);
 
@@ -47,4 +52,3 @@ void imprime_inv(Lista *lista);
 void libera(Lista *lista);
 
 #endif
-
