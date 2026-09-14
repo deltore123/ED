@@ -361,28 +361,41 @@ void imprime(Lista *lista){
     }
 }
 
-// Para o imprime_inv, vamos evitar espaço sobrando no final
-void imprime_inv_recursiva(Termo *atual) {
-    if (atual == NULL){
-        return; 
-    }
-    
-    imprime_inv_recursiva(atual->proximo); 
-    
-    if (atual->proximo != NULL) {
-        printf(" ");
-    }
-    printf("%lld*x^%lld", atual->coeficiente, atual->expoente); 
-}
-
 void imprime_inv(Lista *lista) {
     if (lista == NULL || lista->inicio == NULL) {
         printf("0");
         return;
     }
-    imprime_inv_recursiva(lista->inicio);
-}
 
+    /* Inverte a lista in-place (O(1) de espaco extra) */
+    Termo *anterior = NULL;
+    Termo *atual = lista->inicio;
+    while (atual != NULL) {
+        Termo *proximo = atual->proximo;
+        atual->proximo = anterior;
+        anterior = atual;
+        atual = proximo;
+    }
+    lista->inicio = anterior; /* agora em ordem crescente de grau */
+
+    Termo *no = lista->inicio;
+    while (no != NULL) {
+        printf("%lld*x^%lld", no->coeficiente, no->expoente);
+        if (no->proximo != NULL) printf(" ");
+        no = no->proximo;
+    }
+
+    /* Desfaz a inversao para manter a lista em ordem decrescente */
+    anterior = NULL;
+    atual = lista->inicio;
+    while (atual != NULL) {
+        Termo *proximo = atual->proximo;
+        atual->proximo = anterior;
+        anterior = atual;
+        atual = proximo;
+    }
+    lista->inicio = anterior;
+}
 
 // Retorna ponteiro para nova lista resultante da multiplicação das outras duas
 Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado){
