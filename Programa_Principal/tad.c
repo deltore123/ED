@@ -3,509 +3,546 @@
 #include <string.h>
 #include "tad.h"
 
-#define MAX_LISTAS 512
-
-typedef struct Termo{
+/* estrutura interna de um termo */
+typedef struct Termo {
     long long coeficiente;
     long long expoente;
     struct Termo *proximo;
 } Termo;
 
-typedef struct Lista {
+/* estrutura interna da lista */
+struct Lista {
     Termo *inicio;
     char nome[33];
     int quantidade;
-} Lista;
+};
 
-int compara_termos(const void *a, const void *b)
-{
-    const TermoEntrada *t1 = a;
-    const TermoEntrada *t2 = b;
-
-    if (t1->expoente < t2->expoente)
-        return 1;
-
-    if (t1->expoente > t2->expoente)
-        return -1;
-
-    return 0;
-}
-
-Lista *cria_lista_def(char *nome, TermoEntrada termos[], int quantidade)
-{
-    Lista *lista = cria_lista(nome);
-
-    if (lista == NULL)
-        return NULL;
-
-    qsort(termos, quantidade, sizeof(TermoEntrada), compara_termos);
-
-    Termo *cauda = NULL;
-
-    int i = 0;
-
-    while (i < quantidade) {
-
-        long long expoente = termos[i].expoente;
-        long long coeficiente = 0;
-
-        while (i < quantidade && termos[i].expoente == expoente) {
-            coeficiente += termos[i].coeficiente;
-            i++;
-        }
-
-        if (coeficiente == 0)
-            continue;
-
-        Termo *novo = malloc(sizeof(Termo));
-
-        if (novo == NULL) {
-            libera(lista);
-            return NULL;
-        }
-
-        novo->coeficiente = coeficiente;
-        novo->expoente = expoente;
-        novo->proximo = NULL;
-
-        if (lista->inicio == NULL) {
-            lista->inicio = novo;
-        } else {
-            cauda->proximo = novo;
-        }
-
-        cauda = novo;
-        lista->quantidade++;
-    }
-
-    return lista;
-}
-
-
+/* cria uma lista vazia */
 Lista *cria_lista(char *chave) {
-    // Aloca espaço para a lista dinâmicamente
+
     Lista *lista = malloc(sizeof(Lista));
 
-    // Verifica se espaço foi alocado corretamente
     if (lista == NULL) {
         return NULL;
     }
-   
-    strcpy(lista->nome, chave);
+
+    lista->inicio = NULL;
     lista->quantidade = 0;
-    lista->inicio=NULL;
+
+    strcpy(lista->nome, chave);
+
     return lista;
 }
 
-int adiciona_elemento(Lista *lista, long long coeficiente, long long expoente) {
-    if (coeficiente == 0 || lista == NULL) {
+/* adiciona um termo mantendo a lista ordenada por expoente */
+int adiciona_elemento(
+    Lista *lista,
+    long long coeficiente,
+    long long expoente
+) {
+
+    Termo *novo;
+    Termo *atual;
+    Termo *anterior;
+
+    /* coeficiente zero nao precisa ser armazenado */
+    if (coeficiente == 0) {
+        return 0;
+    }
+
+    novo = malloc(sizeof(Termo));
+
+    if (novo == NULL) {
         return ERRO;
     }
 
-    /* Lista vazia ou novo termo vai antes do início */
-    if (lista->inicio == NULL || expoente > lista->inicio->expoente) {
-        Termo *novo = malloc(sizeof(Termo));
-        if (novo == NULL) return ERRO;
+    novo->coeficiente = coeficiente;
+    novo->expoente = expoente;
+    novo->proximo = NULL;
 
-        novo->coeficiente = coeficiente;
-        novo->expoente = expoente;
-        novo->proximo = lista->inicio;
+    atual = lista->inicio;
+    anterior = NULL;
 
-        lista->inicio = novo;
-        lista->quantidade++;
-        return 0;
-    }
-
-    /* Expoente igual ao do primeiro termo */
-    if (lista->inicio->expoente == expoente) {
-        lista->inicio->coeficiente += coeficiente;
-        if (lista->inicio->coeficiente == 0) {
-            Termo *remover = lista->inicio;
-            lista->inicio = remover->proximo;
-            free(remover);
-            lista->quantidade--;
-        }
-        return 0;
-    }
-
-    /* Passagem única: percorre até encontrar o expoente ou a posição correta */
-    Termo *atual = lista->inicio;
-    while (atual->proximo != NULL && atual->proximo->expoente > expoente) {
+    /* procura a posicao correta */
+    while (atual != NULL && atual->expoente > expoente) {
+        anterior = atual;
         atual = atual->proximo;
     }
 
-    /* Encontrou expoente existente */
-    if (atual->proximo != NULL && atual->proximo->expoente == expoente) {
-        atual->proximo->coeficiente += coeficiente;
-        if (atual->proximo->coeficiente == 0) {
-            Termo *remover = atual->proximo;
-            atual->proximo = remover->proximo;
-            free(remover);
+    /* expoente ja existe */
+    if (atual != NULL && atual->expoente == expoente) {
+
+        atual->coeficiente += coeficiente;
+
+        free(novo);
+
+        /* se o coeficiente ficou zero, remove o termo */
+        if (atual->coeficiente == 0) {
+
+            if (anterior == NULL) {
+                lista->inicio = atual->proximo;
+            } else {
+                anterior->proximo = atual->proximo;
+            }
+
+            free(atual);
             lista->quantidade--;
         }
+
         return 0;
     }
 
-    /* Insere novo termo na posição correta */
-    Termo *novo = malloc(sizeof(Termo));
-    if (novo == NULL) return ERRO;
+    /* insere no inicio */
+    if (anterior == NULL) {
 
-    novo->coeficiente = coeficiente;
-    novo->expoente = expoente;
-    novo->proximo = atual->proximo;
+        novo->proximo = lista->inicio;
+        lista->inicio = novo;
 
-    atual->proximo = novo;
+    } else {
+
+        novo->proximo = atual;
+        anterior->proximo = novo;
+    }
+
     lista->quantidade++;
+
     return 0;
 }
 
-Lista *soma_listas(Lista *lista1, Lista *lista2, char *nome_resultado) {
+/*
+ * cria uma lista a partir dos termos informados pelo usuario.
+ * a leitura fica dentro do TAD, portanto o main nao precisa
+ * conhecer a estrutura Termo.
+ */
+Lista *cria_lista_def(char *nome, int quantidade) {
 
-    if (lista1 == NULL || lista2 == NULL) {
+    Lista *lista;
+    long long coeficiente;
+    long long expoente;
+    int i;
+
+    lista = cria_lista(nome);
+
+    if (lista == NULL) {
         return NULL;
     }
 
-    Lista *resultado = cria_lista(nome_resultado);
+    for (i = 0; i < quantidade; i++) {
+
+        scanf("%lld %lld", &coeficiente, &expoente);
+
+        if (adiciona_elemento(
+                lista,
+                coeficiente,
+                expoente
+            ) == ERRO) {
+
+            libera(lista);
+            return NULL;
+        }
+    }
+
+    return lista;
+}
+
+/* procura uma lista pelo nome */
+Lista *encontra_listas(
+    Lista **listas,
+    int quantidade,
+    char *nome
+) {
+
+    int i;
+
+    for (i = 0; i < quantidade; i++) {
+
+        if (listas[i] != NULL &&
+            strcmp(listas[i]->nome, nome) == 0) {
+
+            return listas[i];
+        }
+    }
+
+    return NULL;
+}
+
+/* cria uma nova lista ou substitui uma existente */
+int insere_ou_substitui(
+    Lista **listas,
+    int *quantidade,
+    char *nome
+) {
+
+    int i;
+
+    for (i = 0; i < *quantidade; i++) {
+
+        if (listas[i] != NULL &&
+            strcmp(listas[i]->nome, nome) == 0) {
+
+            libera(listas[i]);
+
+            listas[i] = cria_lista(nome);
+
+            if (listas[i] == NULL) {
+                return ERRO;
+            }
+
+            return i;
+        }
+    }
+
+    listas[*quantidade] = cria_lista(nome);
+
+    if (listas[*quantidade] == NULL) {
+        return ERRO;
+    }
+
+    (*quantidade)++;
+
+    return *quantidade - 1;
+}
+
+/* soma duas listas */
+Lista *soma_listas(
+    Lista *lista1,
+    Lista *lista2,
+    char *nome_resultado
+) {
+
+    Lista *resultado;
+    Termo *a;
+    Termo *b;
+
+    resultado = cria_lista(nome_resultado);
+
     if (resultado == NULL) {
         return NULL;
     }
 
-    Termo *termo1 = lista1->inicio;
-    Termo *termo2 = lista2->inicio;
-    Termo *cauda = NULL; /* ponteiro para o último termo inserido */
+    a = lista1->inicio;
+    b = lista2->inicio;
 
-    while (termo1 != NULL && termo2 != NULL) {
-        long long coef, exp;
+    while (a != NULL && b != NULL) {
 
-        if (termo1->expoente == termo2->expoente) {
-            coef = termo1->coeficiente + termo2->coeficiente;
-            exp = termo1->expoente;
-            termo1 = termo1->proximo;
-            termo2 = termo2->proximo;
-        } else if (termo1->expoente > termo2->expoente) {
-            coef = termo1->coeficiente;
-            exp = termo1->expoente;
-            termo1 = termo1->proximo;
+        if (a->expoente > b->expoente) {
+
+            adiciona_elemento(
+                resultado,
+                a->coeficiente,
+                a->expoente
+            );
+
+            a = a->proximo;
+
+        } else if (b->expoente > a->expoente) {
+
+            adiciona_elemento(
+                resultado,
+                b->coeficiente,
+                b->expoente
+            );
+
+            b = b->proximo;
+
         } else {
-            coef = termo2->coeficiente;
-            exp = termo2->expoente;
-            termo2 = termo2->proximo;
+
+            adiciona_elemento(
+                resultado,
+                a->coeficiente + b->coeficiente,
+                a->expoente
+            );
+
+            a = a->proximo;
+            b = b->proximo;
         }
-
-        if (coef == 0) continue;
-
-        Termo *novo = malloc(sizeof(Termo));
-        if (novo == NULL) { libera(resultado); return NULL; }
-        novo->coeficiente = coef;
-        novo->expoente = exp;
-        novo->proximo = NULL;
-
-        if (cauda == NULL) {
-            resultado->inicio = novo;
-        } else {
-            cauda->proximo = novo;
-        }
-        cauda = novo;
-        resultado->quantidade++;
     }
 
-    /* Copia os termos restantes da lista que ainda não terminou */
-    Termo *restante = (termo1 != NULL) ? termo1 : termo2;
-    while (restante != NULL) {
-        Termo *novo = malloc(sizeof(Termo));
-        if (novo == NULL) { libera(resultado); return NULL; }
-        novo->coeficiente = restante->coeficiente;
-        novo->expoente = restante->expoente;
-        novo->proximo = NULL;
+    while (a != NULL) {
 
-        if (cauda == NULL) {
-            resultado->inicio = novo;
-        } else {
-            cauda->proximo = novo;
-        }
-        cauda = novo;
-        resultado->quantidade++;
-        restante = restante->proximo;
+        adiciona_elemento(
+            resultado,
+            a->coeficiente,
+            a->expoente
+        );
+
+        a = a->proximo;
+    }
+
+    while (b != NULL) {
+
+        adiciona_elemento(
+            resultado,
+            b->coeficiente,
+            b->expoente
+        );
+
+        b = b->proximo;
     }
 
     return resultado;
 }
 
-Lista *encontra_listas(Lista **lista, int quantidade, char *nome) {
-    int i = 0;
-    while (i < quantidade) {
-        if (lista[i] != NULL && strcmp(lista[i]->nome, nome) == 0) {
-            return lista[i];
-        }
-        i++;
-    }
-    return NULL;
-}
-
-int insere_ou_substitui(Lista *listas[], int *quantidade_listas, char *nome)
-{
-    // Procura se o nome já existe
-    for (int i = 0; i < *quantidade_listas; i++) {
-        if (listas[i] != NULL && strcmp(listas[i]->nome, nome) == 0) {
-            libera(listas[i]);
-            listas[i] = NULL;
-            return i;
-        }
-    }
-
-    // Procura uma posição vazia para reutilizar
-    for (int i = 0; i < *quantidade_listas; i++) {
-        if (listas[i] == NULL) {
-            return i;
-        }
-    }
-
-    // Não encontrou posição vazia
-    if (*quantidade_listas >= MAX_LISTAS) {
-        return -1;
-    }
-
-    // Usa uma nova posição
-    int indice = *quantidade_listas;
-    (*quantidade_listas)++;
-
-    return indice;
-}
-
-long long busca_coeficiente(Lista *lista, long long expoente) {
-    if (lista == NULL) {
-        return 0;
-    }
+/* procura o coeficiente de um expoente */
+long long busca_coeficiente(
+    Lista *lista,
+    long long expoente
+) {
 
     Termo *atual = lista->inicio;
 
-    while (atual != NULL && atual->expoente >= expoente) {
+    while (atual != NULL &&
+           atual->expoente >= expoente) {
+
         if (atual->expoente == expoente) {
             return atual->coeficiente;
         }
+
         atual = atual->proximo;
     }
 
     return 0;
 }
 
-int remove_elemento(Lista *lista, long long grau) {
+/* remove um termo */
+int remove_elemento(
+    Lista *lista,
+    long long grau
+) {
 
-    if (lista == NULL || lista->inicio == NULL) {
-        return ERRO;
-    }
+    Termo *atual;
+    Termo *anterior;
 
-    if (lista->inicio->expoente == grau) {
+    atual = lista->inicio;
+    anterior = NULL;
 
-        Termo *remover = lista->inicio;
+    while (atual != NULL &&
+           atual->expoente > grau) {
 
-        lista->inicio = lista->inicio->proximo;
-
-        free(remover);
-
-        lista->quantidade--;
-
-        return 0;
-    }
-
-    Termo *atual = lista->inicio;
-
-    while (atual->proximo != NULL &&
-           atual->proximo->expoente != grau) {
-
+        anterior = atual;
         atual = atual->proximo;
     }
 
-    if (atual->proximo == NULL) {
+    if (atual == NULL ||
+        atual->expoente != grau) {
+
         return ERRO;
     }
 
-    Termo *remover = atual->proximo;
+    if (anterior == NULL) {
+        lista->inicio = atual->proximo;
+    } else {
+        anterior->proximo = atual->proximo;
+    }
 
-    atual->proximo = remover->proximo;
-
-    free(remover);
+    free(atual);
 
     lista->quantidade--;
 
     return 0;
 }
 
-int removemenor(Lista *lista) {
+/* retorna o maior expoente */
+long long grau(Lista *lista) {
 
-    if (lista == NULL || lista->inicio == NULL) {
-        return ERRO;
-    }
-
-    if (lista->inicio->proximo == NULL) {
-
-        Termo *remover = lista->inicio;
-
-        free (remover);
-
-        lista->inicio= NULL;
-
-        lista->quantidade--;
+    if (lista == NULL ||
+        lista->inicio == NULL) {
 
         return 0;
-    }
-
-    Termo *atual = lista->inicio;
-
-    while (atual->proximo->proximo != NULL) {
-
-        atual = atual->proximo;
-    }
-
-    Termo *remover = atual->proximo;
-
-    atual->proximo = NULL;
-
-    free(remover);
-
-    lista->quantidade--;
-
-    return 0;
-}
-
-long long int grau(Lista *lista) {
-    if (lista == NULL || lista->inicio == NULL) {
-        return ERRO;
     }
 
     return lista->inicio->expoente;
 }
 
-int escala (Lista *lista, long long int escala){
-    if (lista==NULL){
-        return ERRO;
-    }
-    Termo *atual = lista->inicio;
+/* multiplica todos os coeficientes por um valor */
+int escala(
+    Lista *lista,
+    long long escala
+) {
 
-    if (atual == NULL){
-        return ERRO;
-    }
-    if (escala == 0 && atual != NULL){
-        Termo *remove = lista->inicio;
-        atual = atual->proximo;
-        while (atual!=NULL){
-            free (remove);
-            remove = atual;
-            atual=atual->proximo;
+    Termo *atual;
+    Termo *anterior;
+    Termo *proximo;
+
+    atual = lista->inicio;
+    anterior = NULL;
+
+    while (atual != NULL) {
+
+        atual->coeficiente *= escala;
+
+        proximo = atual->proximo;
+
+        /* remove termos que ficaram com coeficiente zero */
+        if (atual->coeficiente == 0) {
+
+            if (anterior == NULL) {
+                lista->inicio = proximo;
+            } else {
+                anterior->proximo = proximo;
+            }
+
+            free(atual);
+            lista->quantidade--;
+
+        } else {
+
+            anterior = atual;
         }
-        free(remove);
-        lista->inicio= NULL;
-        lista->quantidade= 0;
-        return 0;
-    }
-    while (atual!=NULL){
-        atual->coeficiente = atual->coeficiente*escala;
-        atual = atual->proximo;
+
+        atual = proximo;
     }
 
     return 0;
 }
 
-void imprime(Lista *lista){
-    if (lista == NULL || lista->inicio == NULL) {
-        printf("0");
-        return;
-    }
-    Termo *atual = lista->inicio;
-    while (atual != NULL) {
-        printf("%lld*x^%lld", atual->coeficiente, atual->expoente);
-        atual = atual->proximo;
-        if (atual != NULL) {
-            printf(" ");
-        }
-    }
-}
+/* remove o termo de menor expoente */
+int removemenor(Lista *lista) {
 
-void imprime_inv(Lista *lista) {
-    if (lista == NULL || lista->inicio == NULL) {
-        printf("0");
-        return;
+    Termo *atual;
+    Termo *anterior;
+
+    if (lista == NULL ||
+        lista->inicio == NULL) {
+
+        return ERRO;
     }
 
-    /* Inverte a lista in-place (O(1) de espaco extra) */
-    Termo *anterior = NULL;
-    Termo *atual = lista->inicio;
-    while (atual != NULL) {
-        Termo *proximo = atual->proximo;
-        atual->proximo = anterior;
-        anterior = atual;
-        atual = proximo;
-    }
-    lista->inicio = anterior; /* agora em ordem crescente de grau */
-
-    Termo *no = lista->inicio;
-    while (no != NULL) {
-        printf("%lld*x^%lld", no->coeficiente, no->expoente);
-        if (no->proximo != NULL) printf(" ");
-        no = no->proximo;
-    }
-
-    /* Desfaz a inversao para manter a lista em ordem decrescente */
-    anterior = NULL;
     atual = lista->inicio;
-    while (atual != NULL) {
-        Termo *proximo = atual->proximo;
-        atual->proximo = anterior;
+    anterior = NULL;
+
+    while (atual->proximo != NULL) {
+
         anterior = atual;
-        atual = proximo;
-    }
-    lista->inicio = anterior;
-}
-// Retorna ponteiro para nova lista resultante da multiplicação das outras duas
-Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado){
-    if (lista1 == NULL || lista2 == NULL) {
-        return NULL;
+        atual = atual->proximo;
     }
 
-    Lista *resultado = cria_lista(nome_resultado);
+    if (anterior == NULL) {
+        lista->inicio = NULL;
+    } else {
+        anterior->proximo = NULL;
+    }
+
+    free(atual);
+
+    lista->quantidade--;
+
+    return 0;
+}
+
+/* multiplica duas listas */
+Lista *prod(
+    Lista *lista1,
+    Lista *lista2,
+    char *nome_resultado
+) {
+
+    Lista *resultado;
+    Termo *a;
+    Termo *b;
+
+    resultado = cria_lista(nome_resultado);
+
     if (resultado == NULL) {
         return NULL;
     }
 
-    Termo *t1 = lista1->inicio;
-    while(t1 != NULL){
-        // Cria uma lista temporária para guardar t1 multiplicado por todo lista2
-        Lista *temp = cria_lista("temp");
-        
-        Termo *t2 = lista2->inicio;
-        while (t2 != NULL) {
-            long long expoente = t1->expoente + t2->expoente;
-            long long coeficiente = t1->coeficiente * t2->coeficiente;
-            
-            adiciona_elemento(temp, coeficiente, expoente);
-            t2 = t2->proximo;
+    a = lista1->inicio;
+
+    while (a != NULL) {
+
+        b = lista2->inicio;
+
+        while (b != NULL) {
+
+            adiciona_elemento(
+                resultado,
+                a->coeficiente * b->coeficiente,
+                a->expoente + b->expoente
+            );
+
+            b = b->proximo;
         }
 
-        // Soma a lista temp ao nosso resultado acumulado e salva em nova variável
-        Lista *novo_resultado = soma_listas(resultado, temp, nome_resultado);
-        
-        // Destrói as listas velhas para liberar a memória
-        libera(resultado);
-        libera(temp);
-        
-        // Atualiza o ponteiro do resultado
-        resultado = novo_resultado;
-        
-        t1 = t1->proximo;
+        a = a->proximo;
     }
 
     return resultado;
 }
 
-void libera(Lista *lista){
+/* imprime a lista */
+void imprime(Lista *lista) {
+
+    Termo *atual = lista->inicio;
+    int primeiro = 1;
+
+    while (atual != NULL) {
+
+        if (!primeiro && atual->coeficiente > 0) {
+            printf("+");
+        }
+
+        printf("%lldx^%lld",
+               atual->coeficiente,
+               atual->expoente);
+
+        primeiro = 0;
+        atual = atual->proximo;
+    }
+
+    printf("\n");
+}
+
+/* imprime a lista na ordem inversa */
+void imprime_inv(Lista *lista) {
+
+    Termo *anterior = NULL;
+    Termo *atual = lista->inicio;
+    Termo *proximo;
+
+    /* inverte a lista */
+    while (atual != NULL) {
+
+        proximo = atual->proximo;
+        atual->proximo = anterior;
+        anterior = atual;
+        atual = proximo;
+    }
+
+    lista->inicio = anterior;
+
+    imprime(lista);
+
+    /* inverte novamente para recuperar a ordem original */
+    anterior = NULL;
+    atual = lista->inicio;
+
+    while (atual != NULL) {
+
+        proximo = atual->proximo;
+        atual->proximo = anterior;
+        anterior = atual;
+        atual = proximo;
+    }
+
+    lista->inicio = anterior;
+}
+
+/* libera todos os termos e a lista */
+void libera(Lista *lista) {
+
+    Termo *atual;
+    Termo *proximo;
+
     if (lista == NULL) {
         return;
     }
 
-    Termo *atual = lista->inicio;
+    atual = lista->inicio;
 
     while (atual != NULL) {
-        Termo *proximo = atual->proximo;
+
+        proximo = atual->proximo;
         free(atual);
         atual = proximo;
     }

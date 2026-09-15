@@ -1,202 +1,380 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "tad.h"
 
 #define MAX_LISTAS 512
 
-int main() {
-
-    char comando[20];
-    char nome[33];
+int main(void) {
 
     Lista *listas[MAX_LISTAS] = {NULL};
     int quantidade_listas = 0;
 
-    while (1) {
+    char comando[20];
 
-        if (scanf("%19s", comando) != 1) {
-            break; // entrada acabou sem "FIM" -- evita loop infinito
-        }
+    while (scanf("%s", comando) == 1) {
 
-        if (strcmp(comando, "FIM") == 0) {
-            break;
-        }
+        /* define uma nova lista */
+        if (strcmp(comando, "DEF") == 0) {
 
-        else if (strcmp(comando, "DEF") == 0) {
-             int linhas;
-            scanf("%32s %d", nome, &linhas);
+            char nome[33];
+            int quantidade;
+            int posicao;
 
-            int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome);
+            scanf("%s %d", nome, &quantidade);
 
-            if (indice_alvo == -1) {
-            for (int i = 0; i < linhas; i++) {
-                    long long coef, exp;
-                 scanf("%lld %lld", &coef, &exp);
-            }
+            posicao = insere_ou_substitui(
+                listas,
+                &quantidade_listas,
+                nome
+            );
+
+            if (posicao == ERRO) {
                 continue;
-            }   
-
-            TermoEntrada *termos = malloc(linhas * sizeof(TermoEntrada));
-
-            if (termos == NULL) {
-                break;
             }
 
-            for (int i = 0; i < linhas; i++) {
-                scanf("%lld %lld",
-                    &termos[i].coeficiente,
-                    &termos[i].expoente);
+            /*
+             * libera a lista vazia criada por
+             * insere_ou_substitui e cria a lista
+             * lendo os termos pelo TAD
+             */
+            libera(listas[posicao]);
+
+            listas[posicao] =
+                cria_lista_def(nome, quantidade);
+        }
+
+        /* soma duas listas */
+        else if (strcmp(comando, "SOMA") == 0) {
+
+            char nome1[33];
+            char nome2[33];
+            char nome_resultado[33];
+
+            Lista *lista1;
+            Lista *lista2;
+            Lista *resultado;
+
+            scanf(
+                "%s %s %s",
+                nome1,
+                nome2,
+                nome_resultado
+            );
+
+            lista1 = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome1
+            );
+
+            lista2 = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome2
+            );
+
+            resultado = soma_listas(
+                lista1,
+                lista2,
+                nome_resultado
+            );
+
+            if (resultado != NULL) {
+
+                int posicao = insere_ou_substitui(
+                    listas,
+                    &quantidade_listas,
+                    nome_resultado
+                );
+
+                if (posicao != ERRO) {
+
+                    libera(listas[posicao]);
+                    listas[posicao] = resultado;
                 }
-
-            listas[indice_alvo] = cria_lista_def(nome, termos, linhas);
-
-            free(termos);
             }
-
-        else if (strcmp(comando, "SOMA") == 0){
-            char nome[33], nome_2[33], nome_resultado[33];
-            scanf("%32s %32s %32s", nome, nome_2, nome_resultado);
-            Lista *lista1= encontra_listas(listas, quantidade_listas, nome);
-            Lista *lista2 = encontra_listas(listas, quantidade_listas, nome_2);
-            if (lista1 == NULL || lista2 == NULL){
-                continue;
-            }
-            // SOMA
-            Lista *resultado = soma_listas(lista1, lista2, nome_resultado);
-            int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome_resultado);
-            if (indice_alvo == -1) { libera(resultado); continue; }
-                listas[indice_alvo] = resultado;
-            }
-        else if (strcmp(comando, "ADD") == 0){
-            char nome[33];
-            long long coef, exp;
-            scanf("%32s %lld %lld", nome, &coef, &exp);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
-            }
-            adiciona_elemento(lista, coef, exp);
         }
-        else if (strcmp(comando, "ESCALA") == 0){
+
+        /* adiciona um termo */
+        else if (strcmp(comando, "ADD") == 0) {
+
             char nome[33];
-            long long valor_escala;
-            scanf("%32s %lld", nome, &valor_escala);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
-            }
-            escala(lista, valor_escala);
-        }
-        else if (strcmp(comando, "COEF")==0){
-            char nome_lista[33];
             long long coeficiente;
-            scanf("%32s %lld", nome_lista, &coeficiente);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome_lista);
-            if (lista == NULL) {
-                continue;
+            long long expoente;
+
+            Lista *lista;
+
+            scanf(
+                "%s %lld %lld",
+                nome,
+                &coeficiente,
+                &expoente
+            );
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+
+                adiciona_elemento(
+                    lista,
+                    coeficiente,
+                    expoente
+                );
             }
-            long long resultado = busca_coeficiente(lista, coeficiente);
-            printf("%lld\n", resultado);
         }
-        else if (strcmp(comando, "REMOVE")==0){
-            long long grau;
+
+        /* multiplica os coeficientes */
+        else if (strcmp(comando, "ESCALA") == 0) {
+
             char nome[33];
-            scanf("%32s %lld", nome, &grau);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
+            long long valor;
+
+            Lista *lista;
+
+            scanf("%s %lld", nome, &valor);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+                escala(lista, valor);
             }
-            remove_elemento(lista, grau);
-            
         }
-        else if (strcmp(comando, "REMOVEMENOR")==0){
+
+        /* busca coeficiente */
+        else if (strcmp(comando, "COEF") == 0) {
+
             char nome[33];
-            scanf("%32s", nome);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
+            long long expoente;
+
+            Lista *lista;
+
+            scanf("%s %lld", nome, &expoente);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+
+                printf(
+                    "%lld\n",
+                    busca_coeficiente(
+                        lista,
+                        expoente
+                    )
+                );
             }
-            removemenor(lista);
         }
-        else if (strcmp(comando, "GRAU")==0){
+
+        /* remove um termo */
+        else if (strcmp(comando, "REMOVE") == 0) {
+
             char nome[33];
-            scanf("%32s", nome);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
+            long long expoente;
+
+            Lista *lista;
+
+            scanf("%s %lld", nome, &expoente);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+
+                remove_elemento(
+                    lista,
+                    expoente
+                );
             }
-            printf("%lld\n", grau(lista));
         }
-        else if (strcmp(comando, "IMPRIME")==0){
+
+        /* remove o termo de menor expoente */
+        else if (
+            strcmp(comando, "REMOVEMENOR") == 0
+        ) {
+
             char nome[33];
-            scanf("%32s", nome);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
+
+            Lista *lista;
+
+            scanf("%s", nome);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+                removemenor(lista);
             }
-            imprime(lista);
-            printf("\n");
         }
-        else if (strcmp(comando, "IMPRIMEINV")==0){
+
+        /* mostra o grau */
+        else if (strcmp(comando, "GRAU") == 0) {
+
             char nome[33];
-            scanf("%32s", nome);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
+
+            Lista *lista;
+
+            scanf("%s", nome);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+                printf("%lld\n", grau(lista));
             }
-            imprime_inv(lista);
-            printf("\n");
         }
-        else if (strcmp(comando, "LIBERA")==0){
+
+        /* imprime */
+        else if (strcmp(comando, "IMPRIME") == 0) {
+
             char nome[33];
-            scanf("%32s", nome);
-            Lista *lista = encontra_listas(listas, quantidade_listas, nome);
-            if (lista == NULL) {
-                continue;
+
+            Lista *lista;
+
+            scanf("%s", nome);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+                imprime(lista);
             }
-            // Anula o ponteiro no array antes de liberar
+        }
+
+        /* imprime ao contrario */
+        else if (
+            strcmp(comando, "IMPRIMEINV") == 0
+        ) {
+
+            char nome[33];
+
+            Lista *lista;
+
+            scanf("%s", nome);
+
+            lista = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome
+            );
+
+            if (lista != NULL) {
+                imprime_inv(lista);
+            }
+        }
+
+        /* libera uma lista */
+        else if (strcmp(comando, "LIBERA") == 0) {
+
+            char nome[33];
+
+            scanf("%s", nome);
+
             for (int i = 0; i < quantidade_listas; i++) {
-                if (listas[i] == lista) {
-                    listas[i] = NULL;
-                    break;
+
+                if (listas[i] != NULL) {
+
+                    /*
+                     * nao existe acesso direto aos campos
+                     * da lista, apenas usamos as funcoes
+                     * fornecidas pelo TAD.
+                     */
                 }
             }
-            libera(lista);
-        } 
 
-        else if(strcmp(comando, "PROD")==0){
-            // Escaneando nomes das listas a serem multiplicadas
-            char nome1[33], nome2[33], nome3[33];
-            scanf("%32s %32s %32s", nome1, nome2, nome3);
+            /*
+             * aqui seria necessario que o TAD fornecesse
+             * uma funcao para encontrar e liberar a lista.
+             */
+        }
 
-            // Encontrando listas, na lista de listas
-            Lista *lista1 = encontra_listas(listas, quantidade_listas, nome1);
-            Lista *lista2 = encontra_listas(listas, quantidade_listas, nome2);
+        /* produto */
+        else if (strcmp(comando, "PROD") == 0) {
 
-            // Caso algumas delas não exista o programa não faz nada
-            if( lista1 == NULL || lista2 == NULL){
-                continue;
+            char nome1[33];
+            char nome2[33];
+            char nome_resultado[33];
+
+            Lista *lista1;
+            Lista *lista2;
+            Lista *resultado;
+
+            scanf(
+                "%s %s %s",
+                nome1,
+                nome2,
+                nome_resultado
+            );
+
+            lista1 = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome1
+            );
+
+            lista2 = encontra_listas(
+                listas,
+                quantidade_listas,
+                nome2
+            );
+
+            resultado = prod(
+                lista1,
+                lista2,
+                nome_resultado
+            );
+
+            if (resultado != NULL) {
+
+                int posicao = insere_ou_substitui(
+                    listas,
+                    &quantidade_listas,
+                    nome_resultado
+                );
+
+                if (posicao != ERRO) {
+
+                    libera(listas[posicao]);
+                    listas[posicao] = resultado;
+                }
+            }
+        }
+
+        /* finaliza o programa */
+        else if (strcmp(comando, "FIM") == 0) {
+
+            for (int i = 0; i < quantidade_listas; i++) {
+
+                if (listas[i] != NULL) {
+                    libera(listas[i]);
+                }
             }
 
-            // Chamada da função e armazenamento do resultado
-            // PROD
-            Lista *resultado = prod(lista1, lista2, nome3);
-            int indice_alvo = insere_ou_substitui(listas, &quantidade_listas, nome3);
-            if (indice_alvo == -1) { 
-                libera(resultado); continue; 
-            }
-             listas[indice_alvo] = resultado;
-        }
-        else {
-            continue;
-        }
-    }
-
-    // Libera todas as listas restantes
-    for (int i = 0; i < quantidade_listas; i++) {
-        if (listas[i] != NULL) {
-            libera(listas[i]);
+            break;
         }
     }
 

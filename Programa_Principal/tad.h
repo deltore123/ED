@@ -3,61 +3,80 @@
 
 #define ERRO -1
 
-typedef struct {
-    long long coeficiente;
-    long long expoente;
-} TermoEntrada;
-
 typedef struct Lista Lista;
 
-// Obs: As funcionalidades da função Fim ja foram implementadas diretamente na main, por ela isso não está declarada aqui
+/* cria uma lista vazia com o nome informado */
+Lista *cria_lista(char *chave);
 
-// Função DEF: Usada para criar uma lista e definir seu nome
-Lista *cria_lista(char *chave); 
+/* adiciona um termo mantendo a lista ordenada */
+int adiciona_elemento(
+    Lista *lista,
+    long long coeficiente,
+    long long expoente
+);
 
-// Função ADD: Adiciona um elemento à Lista 
-int adiciona_elemento(Lista *lista,long long coeficiente,long long expoente); 
+/* le os termos de um DEF e cria a lista */
+Lista *cria_lista_def(char *nome, int quantidade);
 
-// Função SOMA: Soma duas Listas
-Lista *soma_listas(Lista *lista1, Lista *lista2, char *nome_resultado);
+/* soma duas listas */
+Lista *soma_listas(
+    Lista *lista1,
+    Lista *lista2,
+    char *nome_resultado
+);
 
-// Função Auxiliar que busca o ponteiro para a lista baseado no seu nome em uma lista de listas ( dai a dupla dereferenciação)
-Lista *encontra_listas (Lista **lista, int quantidade, char *nome);
+/* procura uma lista pelo nome */
+Lista *encontra_listas(
+    Lista **listas,
+    int quantidade,
+    char *nome
+);
 
-// Função Auxiliar que retorna o índice onde a nova lista deve ser inserida,
-// liberando a lista pré-existente com o mesmo nome se houver.
-// Incrementa *quantidade se o nome for novo.
-int insere_ou_substitui(Lista **listas, int *quantidade, char *nome);
+/* cria ou substitui uma lista */
+int insere_ou_substitui(
+    Lista **listas,
+    int *quantidade,
+    char *nome
+);
 
-// Função COEF: Dado um exponete, retorna o coeficiente associado a ele 
-long long busca_coeficiente (Lista *lista, long long expoente);
+/* procura o coeficiente de um determinado expoente */
+long long busca_coeficiente(
+    Lista *lista,
+    long long expoente
+);
 
-//  Função REMOVE: Remove o elemento de grau x da lista fornecida
-int remove_elemento(Lista *lista, long long grau);
+/* remove um termo */
+int remove_elemento(
+    Lista *lista,
+    long long grau
+);
 
-// Função GRAU: Retorna o maior expoente da lista
-long long int grau (Lista *lista);
+/* retorna o maior expoente da lista */
+long long grau(Lista *lista);
 
-// Função ESCALA: Multiplica todos os coeficientes da lista por um escalar
-int escala (Lista *lista, long long int escala);
+/* multiplica todos os coeficientes por um valor */
+int escala(
+    Lista *lista,
+    long long escala
+);
 
-// Função REMOVEMENOR : Remove o termo de menor expoente da lista
+/* remove o termo de menor expoente */
 int removemenor(Lista *lista);
 
-// Função PROD: Realiza a multiplicação de dois polinômios
-Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado);
+/* multiplica duas listas */
+Lista *prod(
+    Lista *lista1,
+    Lista *lista2,
+    char *nome_resultado
+);
 
-// Função IMPRIME: Imprime o polinômio formatado corretamente
+/* imprime a lista */
 void imprime(Lista *lista);
 
-// Função IMPRIMEINV: Imprime o polinômio invertido
+/* imprime a lista na ordem inversa */
 void imprime_inv(Lista *lista);
 
-// Função LIBERA: Devolve a memória utilizada pela lista
+/* libera a lista */
 void libera(Lista *lista);
-
-Lista *cria_lista_def(char *nome, TermoEntrada termos[], int quantidade);
-
-int compara_termos(const void *a, const void *b);
 
 #endif
