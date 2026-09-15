@@ -213,71 +213,66 @@ Lista *soma_listas(
     Lista *resultado;
     Termo *a;
     Termo *b;
+    Termo *novo;
+    Termo *cauda; /* ultimo no inserido no resultado */
+    long long coeficiente;
+    long long expoente;
 
     resultado = cria_lista(nome_resultado);
 
-    if (resultado == NULL) {
-        return NULL;
-    }
-
     a = lista1->inicio;
     b = lista2->inicio;
+    cauda = NULL;
 
-    while (a != NULL && b != NULL) {
+    /* percorre as duas listas ao mesmo tempo, como um merge */
+    while (a != NULL || b != NULL) {
 
-        if (a->expoente > b->expoente) {
+        /* termo de a tem expoente maior, ou b acabou */
+        if (b == NULL || (a != NULL && a->expoente > b->expoente)) {
 
-            adiciona_elemento(
-                resultado,
-                a->coeficiente,
-                a->expoente
-            );
+            coeficiente = a->coeficiente;
+            expoente = a->expoente;
 
             a = a->proximo;
 
-        } else if (b->expoente > a->expoente) {
+        /* termo de b tem expoente maior, ou a acabou */
+        } else if (a == NULL || b->expoente > a->expoente) {
 
-            adiciona_elemento(
-                resultado,
-                b->coeficiente,
-                b->expoente
-            );
+            coeficiente = b->coeficiente;
+            expoente = b->expoente;
 
             b = b->proximo;
 
+        /* expoentes iguais, soma os coeficientes */
         } else {
 
-            adiciona_elemento(
-                resultado,
-                a->coeficiente + b->coeficiente,
-                a->expoente
-            );
+            coeficiente = a->coeficiente + b->coeficiente;
+            expoente = a->expoente;
 
             a = a->proximo;
             b = b->proximo;
         }
-    }
 
-    while (a != NULL) {
+        /* coeficiente zero nao precisa ser armazenado */
+        if (coeficiente == 0) {
+            continue;
+        }
 
-        adiciona_elemento(
-            resultado,
-            a->coeficiente,
-            a->expoente
-        );
+        novo = malloc(sizeof(Termo));
 
-        a = a->proximo;
-    }
+        novo->coeficiente = coeficiente;
+        novo->expoente = expoente;
+        novo->proximo = NULL;
 
-    while (b != NULL) {
+        /* insere direto na cauda, sem percorrer a lista */
+        if (cauda == NULL) {
+            resultado->inicio = novo;
+        } else {
+            cauda->proximo = novo;
+        }
 
-        adiciona_elemento(
-            resultado,
-            b->coeficiente,
-            b->expoente
-        );
-
-        b = b->proximo;
+        cauda = novo;
+        resultado->quantidade++;
     }
 
     return resultado;
