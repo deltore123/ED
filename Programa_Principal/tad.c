@@ -158,6 +158,7 @@ int insere_ou_substitui(Lista **listas, int *quantidade, char *nome) {
 
     int i;
 
+    /* verifica se o nome já existe */
     for (i = 0; i < *quantidade; i++) {
 
         if (listas[i] != NULL && strcmp(listas[i]->nome, nome) == 0) {
@@ -172,6 +173,26 @@ int insere_ou_substitui(Lista **listas, int *quantidade, char *nome) {
 
             return i;
         }
+    }
+
+    /* procura uma posição que foi liberada */
+    for (i = 0; i < *quantidade; i++) {
+
+        if (listas[i] == NULL) {
+
+            listas[i] = cria_lista(nome);
+
+            if (listas[i] == NULL) {
+                return ERRO;
+            }
+
+            return i;
+        }
+    }
+
+    /* não existe espaço livre: cria no final */
+    if (*quantidade >= MAX_LISTAS) {
+        return ERRO;
     }
 
     listas[*quantidade] = cria_lista(nome);
@@ -311,7 +332,7 @@ long long grau(Lista *lista) {
 
     if (lista == NULL || lista->inicio == NULL) {
 
-        return 0;
+        return -1;
     }
 
     return lista->inicio->expoente;
@@ -425,6 +446,10 @@ Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado) {
 void imprime(Lista *lista) {
 
     Termo *atual = lista->inicio;
+    if (atual == NULL){
+        printf("0\n");
+        return;
+    }
     int primeiro = 1;
 
     while (atual != NULL) {

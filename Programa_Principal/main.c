@@ -4,7 +4,6 @@
 
 #include "tad.h"
 
-#define MAX_LISTAS 512
 
 int main(void) {
 

@@ -2,6 +2,7 @@
 #define TAD_H
 
 #define ERRO -1
+#define MAX_LISTAS 512
 
 typedef struct Lista Lista;
 
