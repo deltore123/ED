@@ -1,0 +1,7 @@
+DEF Z 2
+5 3
+-5 3
+IMPRIME Z
+GRAU Z
+COEF Z 3
+FIM
