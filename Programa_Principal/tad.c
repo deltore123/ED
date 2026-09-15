@@ -35,11 +35,7 @@ Lista *cria_lista(char *chave) {
 }
 
 /* adiciona um termo mantendo a lista ordenada por expoente */
-int adiciona_elemento(
-    Lista *lista,
-    long long coeficiente,
-    long long expoente
-) {
+int adiciona_elemento(Lista *lista, long long coeficiente, long long expoente) {
 
     Termo *novo;
     Termo *atual;
@@ -131,11 +127,7 @@ Lista *cria_lista_def(char *nome, int quantidade) {
 
         scanf("%lld %lld", &coeficiente, &expoente);
 
-        if (adiciona_elemento(
-                lista,
-                coeficiente,
-                expoente
-            ) == ERRO) {
+        if (adiciona_elemento(lista, coeficiente, expoente) == ERRO) {
 
             libera(lista);
             return NULL;
@@ -146,18 +138,13 @@ Lista *cria_lista_def(char *nome, int quantidade) {
 }
 
 /* procura uma lista pelo nome */
-Lista *encontra_listas(
-    Lista **listas,
-    int quantidade,
-    char *nome
-) {
+Lista *encontra_listas(Lista **listas, int quantidade, char *nome) {
 
     int i;
 
     for (i = 0; i < quantidade; i++) {
 
-        if (listas[i] != NULL &&
-            strcmp(listas[i]->nome, nome) == 0) {
+        if (listas[i] != NULL && strcmp(listas[i]->nome, nome) == 0) {
 
             return listas[i];
         }
@@ -167,18 +154,13 @@ Lista *encontra_listas(
 }
 
 /* cria uma nova lista ou substitui uma existente */
-int insere_ou_substitui(
-    Lista **listas,
-    int *quantidade,
-    char *nome
-) {
+int insere_ou_substitui(Lista **listas, int *quantidade, char *nome) {
 
     int i;
 
     for (i = 0; i < *quantidade; i++) {
 
-        if (listas[i] != NULL &&
-            strcmp(listas[i]->nome, nome) == 0) {
+        if (listas[i] != NULL && strcmp(listas[i]->nome, nome) == 0) {
 
             libera(listas[i]);
 
@@ -204,11 +186,7 @@ int insere_ou_substitui(
 }
 
 /* soma duas listas */
-Lista *soma_listas(
-    Lista *lista1,
-    Lista *lista2,
-    char *nome_resultado
-) {
+Lista *soma_listas(Lista *lista1, Lista *lista2, char *nome_resultado) {
 
     Lista *resultado;
     Termo *a;
@@ -279,15 +257,11 @@ Lista *soma_listas(
 }
 
 /* procura o coeficiente de um expoente */
-long long busca_coeficiente(
-    Lista *lista,
-    long long expoente
-) {
+long long busca_coeficiente(Lista *lista, long long expoente) {
 
     Termo *atual = lista->inicio;
 
-    while (atual != NULL &&
-           atual->expoente >= expoente) {
+    while (atual != NULL && atual->expoente >= expoente) {
 
         if (atual->expoente == expoente) {
             return atual->coeficiente;
@@ -300,10 +274,7 @@ long long busca_coeficiente(
 }
 
 /* remove um termo */
-int remove_elemento(
-    Lista *lista,
-    long long grau
-) {
+int remove_elemento(Lista *lista, long long grau) {
 
     Termo *atual;
     Termo *anterior;
@@ -311,15 +282,13 @@ int remove_elemento(
     atual = lista->inicio;
     anterior = NULL;
 
-    while (atual != NULL &&
-           atual->expoente > grau) {
+    while (atual != NULL && atual->expoente > grau) {
 
         anterior = atual;
         atual = atual->proximo;
     }
 
-    if (atual == NULL ||
-        atual->expoente != grau) {
+    if (atual == NULL || atual->expoente != grau) {
 
         return ERRO;
     }
@@ -340,8 +309,7 @@ int remove_elemento(
 /* retorna o maior expoente */
 long long grau(Lista *lista) {
 
-    if (lista == NULL ||
-        lista->inicio == NULL) {
+    if (lista == NULL || lista->inicio == NULL) {
 
         return 0;
     }
@@ -350,10 +318,7 @@ long long grau(Lista *lista) {
 }
 
 /* multiplica todos os coeficientes por um valor */
-int escala(
-    Lista *lista,
-    long long escala
-) {
+int escala(Lista *lista, long long escala) {
 
     Termo *atual;
     Termo *anterior;
@@ -397,8 +362,7 @@ int removemenor(Lista *lista) {
     Termo *atual;
     Termo *anterior;
 
-    if (lista == NULL ||
-        lista->inicio == NULL) {
+    if (lista == NULL || lista->inicio == NULL) {
 
         return ERRO;
     }
@@ -426,11 +390,7 @@ int removemenor(Lista *lista) {
 }
 
 /* multiplica duas listas */
-Lista *prod(
-    Lista *lista1,
-    Lista *lista2,
-    char *nome_resultado
-) {
+Lista *prod(Lista *lista1, Lista *lista2, char *nome_resultado) {
 
     Lista *resultado;
     Termo *a;
@@ -450,11 +410,7 @@ Lista *prod(
 
         while (b != NULL) {
 
-            adiciona_elemento(
-                resultado,
-                a->coeficiente * b->coeficiente,
-                a->expoente + b->expoente
-            );
+            adiciona_elemento(resultado, a->coeficiente * b->coeficiente, a->expoente + b->expoente);
 
             b = b->proximo;
         }
@@ -477,9 +433,7 @@ void imprime(Lista *lista) {
             printf("+");
         }
 
-        printf("%lldx^%lld",
-               atual->coeficiente,
-               atual->expoente);
+        printf("%lldx^%lld", atual->coeficiente, atual->expoente);
 
         primeiro = 0;
         atual = atual->proximo;

@@ -24,25 +24,15 @@ int main(void) {
 
             scanf("%s %d", nome, &quantidade);
 
-            posicao = insere_ou_substitui(
-                listas,
-                &quantidade_listas,
-                nome
-            );
+            posicao = insere_ou_substitui(listas, &quantidade_listas, nome);
 
             if (posicao == ERRO) {
                 continue;
             }
 
-            /*
-             * libera a lista vazia criada por
-             * insere_ou_substitui e cria a lista
-             * lendo os termos pelo TAD
-             */
             libera(listas[posicao]);
 
-            listas[posicao] =
-                cria_lista_def(nome, quantidade);
+            listas[posicao] = cria_lista_def(nome, quantidade);
         }
 
         /* soma duas listas */
@@ -56,38 +46,16 @@ int main(void) {
             Lista *lista2;
             Lista *resultado;
 
-            scanf(
-                "%s %s %s",
-                nome1,
-                nome2,
-                nome_resultado
-            );
+            scanf("%s %s %s", nome1, nome2, nome_resultado);
 
-            lista1 = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome1
-            );
+            lista1 = encontra_listas(listas, quantidade_listas, nome1);
+            lista2 = encontra_listas(listas, quantidade_listas, nome2);
 
-            lista2 = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome2
-            );
-
-            resultado = soma_listas(
-                lista1,
-                lista2,
-                nome_resultado
-            );
+            resultado = soma_listas(lista1,lista2,nome_resultado);
 
             if (resultado != NULL) {
 
-                int posicao = insere_ou_substitui(
-                    listas,
-                    &quantidade_listas,
-                    nome_resultado
-                );
+                int posicao = insere_ou_substitui(listas,&quantidade_listas,nome_resultado);
 
                 if (posicao != ERRO) {
 
@@ -106,26 +74,13 @@ int main(void) {
 
             Lista *lista;
 
-            scanf(
-                "%s %lld %lld",
-                nome,
-                &coeficiente,
-                &expoente
-            );
+            scanf("%s %lld %lld",nome,&coeficiente,&expoente);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
 
-                adiciona_elemento(
-                    lista,
-                    coeficiente,
-                    expoente
-                );
+                adiciona_elemento(lista,coeficiente,expoente);
             }
         }
 
@@ -139,11 +94,7 @@ int main(void) {
 
             scanf("%s %lld", nome, &valor);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
                 escala(lista, valor);
@@ -160,21 +111,11 @@ int main(void) {
 
             scanf("%s %lld", nome, &expoente);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
 
-                printf(
-                    "%lld\n",
-                    busca_coeficiente(
-                        lista,
-                        expoente
-                    )
-                );
+                printf("%lld\n",busca_coeficiente(lista,expoente));
             }
         }
 
@@ -188,25 +129,16 @@ int main(void) {
 
             scanf("%s %lld", nome, &expoente);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
 
-                remove_elemento(
-                    lista,
-                    expoente
-                );
+                remove_elemento(lista,expoente);
             }
         }
 
         /* remove o termo de menor expoente */
-        else if (
-            strcmp(comando, "REMOVEMENOR") == 0
-        ) {
+        else if (strcmp(comando, "REMOVEMENOR") == 0) {
 
             char nome[33];
 
@@ -214,11 +146,7 @@ int main(void) {
 
             scanf("%s", nome);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
                 removemenor(lista);
@@ -234,11 +162,7 @@ int main(void) {
 
             scanf("%s", nome);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
                 printf("%lld\n", grau(lista));
@@ -254,11 +178,7 @@ int main(void) {
 
             scanf("%s", nome);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
                 imprime(lista);
@@ -266,9 +186,7 @@ int main(void) {
         }
 
         /* imprime ao contrario */
-        else if (
-            strcmp(comando, "IMPRIMEINV") == 0
-        ) {
+        else if (strcmp(comando, "IMPRIMEINV") == 0) {
 
             char nome[33];
 
@@ -276,11 +194,7 @@ int main(void) {
 
             scanf("%s", nome);
 
-            lista = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome
-            );
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
             if (lista != NULL) {
                 imprime_inv(lista);
@@ -291,25 +205,24 @@ int main(void) {
         else if (strcmp(comando, "LIBERA") == 0) {
 
             char nome[33];
+            Lista *lista;
 
             scanf("%s", nome);
 
-            for (int i = 0; i < quantidade_listas; i++) {
+            lista = encontra_listas(listas, quantidade_listas, nome);
 
-                if (listas[i] != NULL) {
+            if (lista != NULL) {
 
-                    /*
-                     * nao existe acesso direto aos campos
-                     * da lista, apenas usamos as funcoes
-                     * fornecidas pelo TAD.
-                     */
+                for (int i = 0; i < quantidade_listas; i++) {
+
+                    if (listas[i] == lista) {
+
+                        libera(listas[i]);
+                        listas[i] = NULL;
+                        break;
+                    }
                 }
             }
-
-            /*
-             * aqui seria necessario que o TAD fornecesse
-             * uma funcao para encontrar e liberar a lista.
-             */
         }
 
         /* produto */
@@ -323,39 +236,17 @@ int main(void) {
             Lista *lista2;
             Lista *resultado;
 
-            scanf(
-                "%s %s %s",
-                nome1,
-                nome2,
-                nome_resultado
-            );
+            scanf("%s %s %s",nome1,nome2,nome_resultado);
 
-            lista1 = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome1
-            );
+            lista1 = encontra_listas(listas, quantidade_listas, nome1);
+            lista2 = encontra_listas(listas, quantidade_listas, nome2);
 
-            lista2 = encontra_listas(
-                listas,
-                quantidade_listas,
-                nome2
-            );
-
-            resultado = prod(
-                lista1,
-                lista2,
-                nome_resultado
-            );
+            resultado = prod(lista1, lista2, nome_resultado);
 
             if (resultado != NULL) {
 
-                int posicao = insere_ou_substitui(
-                    listas,
-                    &quantidade_listas,
-                    nome_resultado
-                );
-
+                int posicao = insere_ou_substitui(listas,&quantidade_listas,nome_resultado);
+                
                 if (posicao != ERRO) {
 
                     libera(listas[posicao]);
