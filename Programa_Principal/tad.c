@@ -153,53 +153,42 @@ Lista *encontra_listas(Lista **listas, int quantidade, char *nome) {
     return NULL;
 }
 
-/* cria uma nova lista ou substitui uma existente */
+/*
+ * reserva uma posicao no vetor de listas para o nome informado.
+ * se ja existir uma lista com esse nome, ela e liberada e a posicao
+ * fica marcada como NULL. se nao existir, procura uma posicao livre
+ * ou cria uma nova no final
+ */
 int insere_ou_substitui(Lista **listas, int *quantidade, char *nome) {
 
     int i;
 
-    /* verifica se o nome já existe */
+    /* ja existe uma lista com esse nome: libera e marca a posicao como livre */
     for (i = 0; i < *quantidade; i++) {
 
         if (listas[i] != NULL && strcmp(listas[i]->nome, nome) == 0) {
 
             libera(listas[i]);
-
-            listas[i] = cria_lista(nome);
-
-            if (listas[i] == NULL) {
-                return ERRO;
-            }
+            listas[i] = NULL;
 
             return i;
         }
     }
 
-    /* procura uma posição que foi liberada */
+    /* procura uma posicao que ja esta livre */
     for (i = 0; i < *quantidade; i++) {
 
         if (listas[i] == NULL) {
-
-            listas[i] = cria_lista(nome);
-
-            if (listas[i] == NULL) {
-                return ERRO;
-            }
-
             return i;
         }
     }
 
-    /* não existe espaço livre: cria no final */
+    /* nao existe espaco livre: reserva uma posicao no final */
     if (*quantidade >= MAX_LISTAS) {
         return ERRO;
     }
 
-    listas[*quantidade] = cria_lista(nome);
-
-    if (listas[*quantidade] == NULL) {
-        return ERRO;
-    }
+    listas[*quantidade] = NULL;
 
     (*quantidade)++;
 
@@ -218,6 +207,10 @@ Lista *soma_listas(Lista *lista1, Lista *lista2, char *nome_resultado) {
     long long expoente;
 
     resultado = cria_lista(nome_resultado);
+
+    if (resultado == NULL) {
+        return NULL;
+    }
 
     a = lista1->inicio;
     b = lista2->inicio;
@@ -454,11 +447,11 @@ void imprime(Lista *lista) {
 
     while (atual != NULL) {
 
-        if (!primeiro && atual->coeficiente > 0) {
-            printf("+");
+        if (!primeiro) {
+            printf(" ");
         }
 
-        printf("%lldx^%lld", atual->coeficiente, atual->expoente);
+        printf("%lld*x^%lld", atual->coeficiente, atual->expoente);
 
         primeiro = 0;
         atual = atual->proximo;

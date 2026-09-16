@@ -33,7 +33,7 @@ Lista *encontra_listas(
     char *nome
 );
 
-/* cria ou substitui uma lista */
+/* reserva (ou libera e reserva) uma posicao para uma lista com o nome dado */
 int insere_ou_substitui(
     Lista **listas,
     int *quantidade,

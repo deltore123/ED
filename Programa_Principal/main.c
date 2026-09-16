@@ -29,8 +29,6 @@ int main(void) {
                 continue;
             }
 
-            libera(listas[posicao]);
-
             listas[posicao] = cria_lista_def(nome, quantidade);
         }
 
@@ -58,8 +56,11 @@ int main(void) {
 
                 if (posicao != ERRO) {
 
-                    libera(listas[posicao]);
                     listas[posicao] = resultado;
+
+                } else {
+
+                    libera(resultado);
                 }
             }
         }
@@ -245,11 +246,14 @@ int main(void) {
             if (resultado != NULL) {
 
                 int posicao = insere_ou_substitui(listas,&quantidade_listas,nome_resultado);
-                
+
                 if (posicao != ERRO) {
 
-                    libera(listas[posicao]);
                     listas[posicao] = resultado;
+
+                } else {
+
+                    libera(resultado);
                 }
             }
         }
